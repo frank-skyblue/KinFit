@@ -1,0 +1,1080 @@
+[
+  {
+    "name": "Chest press machine",
+    "muscleGroups": [
+      "chest",
+      "triceps"
+    ],
+    "category": "strength"
+  },
+  {
+    "name": "Machine fly",
+    "muscleGroups": [
+      "chest"
+    ],
+    "category": "strength"
+  },
+  {
+    "name": "Serratus anterior wall planks",
+    "muscleGroups": [
+      "serratus",
+      "core",
+      "abs"
+    ],
+    "category": "strength"
+  },
+  {
+    "name": "Squat",
+    "muscleGroups": [
+      "quadriceps",
+      "glutes",
+      "core"
+    ],
+    "category": "strength"
+  },
+  {
+    "name": "Leg curl machine",
+    "muscleGroups": [
+      "hamstrings"
+    ],
+    "category": "strength"
+  },
+  {
+    "name": "Adduction machine",
+    "muscleGroups": [
+      "adductors"
+    ],
+    "category": "strength"
+  },
+  {
+    "name": "Abduction machine",
+    "muscleGroups": [
+      "abductors",
+      "glutes"
+    ],
+    "category": "strength"
+  },
+  {
+    "name": "Cable rear delt fly",
+    "muscleGroups": [
+      "chest",
+      "rear delts",
+      "shoulders"
+    ],
+    "category": "strength"
+  },
+  {
+    "name": "DB side delt raises",
+    "muscleGroups": [
+      "shoulders"
+    ],
+    "category": "strength"
+  },
+  {
+    "name": "SH Cable Tricep extension",
+    "muscleGroups": [
+      "triceps"
+    ],
+    "category": "strength"
+  },
+  {
+    "name": "Cable Woodchopper",
+    "muscleGroups": [
+      "obliques",
+      "core"
+    ],
+    "category": "strength"
+  },
+  {
+    "name": "DB bent over rows",
+    "muscleGroups": [
+      "back",
+      "lats"
+    ],
+    "category": "strength"
+  },
+  {
+    "name": "DB Lat pullover",
+    "muscleGroups": [
+      "lats",
+      "chest"
+    ],
+    "category": "strength"
+  },
+  {
+    "name": "Machine press",
+    "muscleGroups": [
+      "chest",
+      "triceps"
+    ],
+    "category": "strength"
+  },
+  {
+    "name": "Cable external rotation",
+    "muscleGroups": [
+      "rotator cuff",
+      "shoulders"
+    ],
+    "category": "strength"
+  },
+  {
+    "name": "Reverse crunches",
+    "muscleGroups": [
+      "abs"
+    ],
+    "category": "strength"
+  },
+  {
+    "name": "Knee touch crunches",
+    "muscleGroups": [
+      "abs"
+    ],
+    "category": "strength"
+  },
+  {
+    "name": "Side planks",
+    "muscleGroups": [
+      "core",
+      "abs"
+    ],
+    "category": "strength"
+  },
+  {
+    "name": "Deadlift",
+    "muscleGroups": [
+      "back",
+      "hamstrings",
+      "glutes",
+      "core"
+    ],
+    "category": "strength"
+  },
+  {
+    "name": "Decline Bench press",
+    "muscleGroups": [
+      "chest",
+      "triceps",
+      "shoulders"
+    ],
+    "category": "strength"
+  },
+  {
+    "name": "Fly machine",
+    "muscleGroups": [
+      "chest"
+    ],
+    "category": "strength"
+  },
+  {
+    "name": "Leg Extension",
+    "muscleGroups": [
+      "quadriceps"
+    ],
+    "category": "strength"
+  },
+  {
+    "name": "Bulgarian Split Squat",
+    "muscleGroups": [
+      "quadriceps",
+      "glutes",
+      "balance"
+    ],
+    "category": "strength"
+  },
+  {
+    "name": "Seated row",
+    "muscleGroups": [
+      "back",
+      "lats"
+    ],
+    "category": "strength"
+  },
+  {
+    "name": "Deadbugs",
+    "muscleGroups": [
+      "core",
+      "abs"
+    ],
+    "category": "strength"
+  },
+  {
+    "name": "Planks",
+    "muscleGroups": [
+      "core",
+      "abs"
+    ],
+    "category": "strength"
+  },
+  {
+    "name": "DB rows",
+    "muscleGroups": [
+      "back",
+      "lats"
+    ],
+    "category": "strength"
+  },
+  {
+    "name": "SL calf raises",
+    "muscleGroups": [
+      "calves"
+    ],
+    "category": "strength"
+  },
+  {
+    "name": "Lat Pulldown",
+    "muscleGroups": [
+      "lats",
+      "biceps"
+    ],
+    "category": "strength"
+  },
+  {
+    "name": "Cable Fly",
+    "muscleGroups": [
+      "chest"
+    ],
+    "category": "strength"
+  },
+  {
+    "name": "Leg raises",
+    "muscleGroups": [
+      "abs",
+      "hip flexors"
+    ],
+    "category": "strength"
+  },
+  {
+    "name": "DB Rows",
+    "muscleGroups": [
+      "back",
+      "lats"
+    ],
+    "category": "strength"
+  },
+  {
+    "name": "Fly Machine",
+    "muscleGroups": [
+      "chest"
+    ],
+    "category": "strength"
+  },
+  {
+    "name": "Cable rotator cuff Extension rotation",
+    "muscleGroups": [
+      "rotator cuff",
+      "shoulders"
+    ],
+    "category": "strength"
+  },
+  {
+    "name": "Cable rear delt fly -> rear delt fly",
+    "muscleGroups": [
+      "chest",
+      "rear delts",
+      "shoulders"
+    ],
+    "category": "strength"
+  },
+  {
+    "name": "Stratus Anterior wall planks",
+    "muscleGroups": [
+      "core",
+      "abs"
+    ],
+    "category": "strength"
+  },
+  {
+    "name": "DB press",
+    "muscleGroups": [
+      "chest",
+      "triceps"
+    ],
+    "category": "strength"
+  },
+  {
+    "name": "Rear delt fly machine",
+    "muscleGroups": [
+      "chest",
+      "rear delts",
+      "shoulders"
+    ],
+    "category": "strength"
+  },
+  {
+    "name": "DB side crunches",
+    "muscleGroups": [
+      "abs"
+    ],
+    "category": "strength"
+  },
+  {
+    "name": "Machine Fly",
+    "muscleGroups": [
+      "chest"
+    ],
+    "category": "strength"
+  },
+  {
+    "name": "Cable Rear delt fly",
+    "muscleGroups": [
+      "chest",
+      "rear delts",
+      "shoulders"
+    ],
+    "category": "strength"
+  },
+  {
+    "name": "Seated row machine",
+    "muscleGroups": [
+      "back",
+      "lats"
+    ],
+    "category": "strength"
+  },
+  {
+    "name": "Twists machine",
+    "muscleGroups": [
+      "obliques",
+      "abs"
+    ],
+    "category": "strength"
+  },
+  {
+    "name": "Seated rows",
+    "muscleGroups": [
+      "back",
+      "lats"
+    ],
+    "category": "strength"
+  },
+  {
+    "name": "Lat pullovers",
+    "muscleGroups": [
+      "lats",
+      "chest"
+    ],
+    "category": "strength"
+  },
+  {
+    "name": "Bench press",
+    "muscleGroups": [
+      "chest",
+      "triceps",
+      "shoulders"
+    ],
+    "category": "strength"
+  },
+  {
+    "name": "Rope triceps pull down*",
+    "muscleGroups": [
+      "other"
+    ],
+    "category": "strength"
+  },
+  {
+    "name": "DB Bench press",
+    "muscleGroups": [
+      "chest",
+      "triceps",
+      "shoulders"
+    ],
+    "category": "strength"
+  },
+  {
+    "name": "Leg curls",
+    "muscleGroups": [
+      "hamstrings"
+    ],
+    "category": "strength"
+  },
+  {
+    "name": "bicep curls machine",
+    "muscleGroups": [
+      "biceps"
+    ],
+    "category": "strength"
+  },
+  {
+    "name": "Seated 45 degree incline bicep curls",
+    "muscleGroups": [
+      "chest",
+      "shoulders",
+      "biceps"
+    ],
+    "category": "strength"
+  },
+  {
+    "name": "Military press",
+    "muscleGroups": [
+      "shoulders",
+      "triceps"
+    ],
+    "category": "strength"
+  },
+  {
+    "name": "Abduction leg raises",
+    "muscleGroups": [
+      "abductors",
+      "glutes",
+      "abs",
+      "hip flexors"
+    ],
+    "category": "strength"
+  },
+  {
+    "name": "Side delt raises",
+    "muscleGroups": [
+      "shoulders"
+    ],
+    "category": "strength"
+  },
+  {
+    "name": "Cable Tricep Extension",
+    "muscleGroups": [
+      "triceps"
+    ],
+    "category": "strength"
+  },
+  {
+    "name": "Cable Lumberjack",
+    "muscleGroups": [
+      "obliques",
+      "core"
+    ],
+    "category": "strength"
+  },
+  {
+    "name": "Bent over DB rows",
+    "muscleGroups": [
+      "back",
+      "lats"
+    ],
+    "category": "strength"
+  },
+  {
+    "name": "Knee Touch Crunches",
+    "muscleGroups": [
+      "abs"
+    ],
+    "category": "strength"
+  },
+  {
+    "name": "rear delt fly machine",
+    "muscleGroups": [
+      "chest",
+      "rear delts",
+      "shoulders"
+    ],
+    "category": "strength"
+  },
+  {
+    "name": "Leg press machine",
+    "muscleGroups": [
+      "quadriceps",
+      "glutes"
+    ],
+    "category": "strength"
+  },
+  {
+    "name": "Single handed cable Tricep Extension",
+    "muscleGroups": [
+      "triceps"
+    ],
+    "category": "strength"
+  },
+  {
+    "name": "Side bends",
+    "muscleGroups": [
+      "obliques"
+    ],
+    "category": "strength"
+  },
+  {
+    "name": "Side DB raises",
+    "muscleGroups": [
+      "other"
+    ],
+    "category": "strength"
+  },
+  {
+    "name": "Leg curls (laying) GL",
+    "muscleGroups": [
+      "hamstrings"
+    ],
+    "category": "strength"
+  },
+  {
+    "name": "Calf Machine GL",
+    "muscleGroups": [
+      "calves"
+    ],
+    "category": "strength"
+  },
+  {
+    "name": "Abductor laying Leg raises",
+    "muscleGroups": [
+      "abductors",
+      "glutes",
+      "abs",
+      "hip flexors"
+    ],
+    "category": "strength"
+  },
+  {
+    "name": "Adductor laying leg raises",
+    "muscleGroups": [
+      "adductors",
+      "abs",
+      "hip flexors"
+    ],
+    "category": "strength"
+  },
+  {
+    "name": "DB Military press",
+    "muscleGroups": [
+      "shoulders",
+      "triceps"
+    ],
+    "category": "strength"
+  },
+  {
+    "name": "Calf Machine (standing) GL",
+    "muscleGroups": [
+      "calves"
+    ],
+    "category": "strength"
+  },
+  {
+    "name": "Abductor leg raises",
+    "muscleGroups": [
+      "abductors",
+      "glutes",
+      "abs",
+      "hip flexors"
+    ],
+    "category": "strength"
+  },
+  {
+    "name": "Seated side raises",
+    "muscleGroups": [
+      "other"
+    ],
+    "category": "strength"
+  },
+  {
+    "name": "DB Tricep Extension",
+    "muscleGroups": [
+      "triceps"
+    ],
+    "category": "strength"
+  },
+  {
+    "name": "Side DB crunches",
+    "muscleGroups": [
+      "abs"
+    ],
+    "category": "strength"
+  },
+  {
+    "name": "Calf Machine (horizontal) GL",
+    "muscleGroups": [
+      "calves"
+    ],
+    "category": "strength"
+  },
+  {
+    "name": "Abs twists machine GL",
+    "muscleGroups": [
+      "obliques",
+      "abs"
+    ],
+    "category": "strength"
+  },
+  {
+    "name": "DB Romanian Deadlift",
+    "muscleGroups": [
+      "back",
+      "hamstrings",
+      "glutes",
+      "core"
+    ],
+    "category": "strength"
+  },
+  {
+    "name": "Adductor machine",
+    "muscleGroups": [
+      "adductors"
+    ],
+    "category": "strength"
+  },
+  {
+    "name": "Bicep curls machine",
+    "muscleGroups": [
+      "biceps"
+    ],
+    "category": "strength"
+  },
+  {
+    "name": "Incline Bicep curls",
+    "muscleGroups": [
+      "chest",
+      "shoulders",
+      "biceps"
+    ],
+    "category": "strength"
+  },
+  {
+    "name": "Leg curls m",
+    "muscleGroups": [
+      "hamstrings"
+    ],
+    "category": "strength"
+  },
+  {
+    "name": "DB Side Delt Lateral Raises",
+    "muscleGroups": [
+      "shoulders"
+    ],
+    "category": "strength"
+  },
+  {
+    "name": "Seated Calf machine",
+    "muscleGroups": [
+      "calves"
+    ],
+    "category": "strength"
+  },
+  {
+    "name": "Cable Side delt raises",
+    "muscleGroups": [
+      "shoulders"
+    ],
+    "category": "strength"
+  },
+  {
+    "name": "DB Bench",
+    "muscleGroups": [
+      "chest",
+      "triceps"
+    ],
+    "category": "strength"
+  },
+  {
+    "name": "Cable Side Delt Lateral Raises",
+    "muscleGroups": [
+      "shoulders"
+    ],
+    "category": "strength"
+  },
+  {
+    "name": "SL DB Romanian Deadlift",
+    "muscleGroups": [
+      "back",
+      "hamstrings",
+      "glutes",
+      "core",
+      "balance"
+    ],
+    "category": "strength"
+  },
+  {
+    "name": "Leg curls machine",
+    "muscleGroups": [
+      "hamstrings"
+    ],
+    "category": "strength"
+  },
+  {
+    "name": "Shrugs",
+    "muscleGroups": [
+      "traps"
+    ],
+    "category": "strength"
+  },
+  {
+    "name": "Cable Viking bicep curls",
+    "muscleGroups": [
+      "biceps"
+    ],
+    "category": "strength"
+  },
+  {
+    "name": "Romanian Deadlift",
+    "muscleGroups": [
+      "back",
+      "hamstrings",
+      "glutes",
+      "core"
+    ],
+    "category": "strength"
+  },
+  {
+    "name": "Hanging Leg raises",
+    "muscleGroups": [
+      "abs",
+      "hip flexors"
+    ],
+    "category": "strength"
+  },
+  {
+    "name": "DB Delt Lateral Raises",
+    "muscleGroups": [
+      "shoulders"
+    ],
+    "category": "strength"
+  },
+  {
+    "name": "SL Leg Extension",
+    "muscleGroups": [
+      "quadriceps"
+    ],
+    "category": "strength"
+  },
+  {
+    "name": "SL Leg Curls",
+    "muscleGroups": [
+      "hamstrings"
+    ],
+    "category": "strength"
+  },
+  {
+    "name": "Leg Press",
+    "muscleGroups": [
+      "quadriceps",
+      "glutes"
+    ],
+    "category": "strength"
+  },
+  {
+    "name": "Calf Press on leg press machine",
+    "muscleGroups": [
+      "quadriceps",
+      "glutes",
+      "calves"
+    ],
+    "category": "strength"
+  },
+  {
+    "name": "SL Romanian Deadlift",
+    "muscleGroups": [
+      "back",
+      "hamstrings",
+      "glutes",
+      "core",
+      "balance"
+    ],
+    "category": "strength"
+  },
+  {
+    "name": "Rear delt machine",
+    "muscleGroups": [
+      "rear delts",
+      "shoulders"
+    ],
+    "category": "strength"
+  },
+  {
+    "name": "Russian twists",
+    "muscleGroups": [
+      "obliques",
+      "abs"
+    ],
+    "category": "strength"
+  },
+  {
+    "name": "DB Side delt raises",
+    "muscleGroups": [
+      "shoulders"
+    ],
+    "category": "strength"
+  },
+  {
+    "name": "Leg Curls Machine",
+    "muscleGroups": [
+      "hamstrings"
+    ],
+    "category": "strength"
+  },
+  {
+    "name": "Cable Rear delt",
+    "muscleGroups": [
+      "rear delts",
+      "shoulders"
+    ],
+    "category": "strength"
+  },
+  {
+    "name": "Woodcutter twists",
+    "muscleGroups": [
+      "obliques",
+      "abs"
+    ],
+    "category": "strength"
+  },
+  {
+    "name": "DB SL Romanian Deadlift",
+    "muscleGroups": [
+      "back",
+      "hamstrings",
+      "glutes",
+      "core",
+      "balance"
+    ],
+    "category": "strength"
+  },
+  {
+    "name": "Cable Delt Lateral Raises",
+    "muscleGroups": [
+      "shoulders"
+    ],
+    "category": "strength"
+  },
+  {
+    "name": "DB Lateral Raises",
+    "muscleGroups": [
+      "shoulders"
+    ],
+    "category": "strength"
+  },
+  {
+    "name": "Leg Curls Machine laying",
+    "muscleGroups": [
+      "hamstrings"
+    ],
+    "category": "strength"
+  },
+  {
+    "name": "DB Bulgarian Split Squat",
+    "muscleGroups": [
+      "quadriceps",
+      "glutes",
+      "balance"
+    ],
+    "category": "strength"
+  },
+  {
+    "name": "Pull Ups",
+    "muscleGroups": [
+      "lats",
+      "biceps",
+      "back"
+    ],
+    "category": "strength"
+  },
+  {
+    "name": "Bench press machine",
+    "muscleGroups": [
+      "chest",
+      "triceps",
+      "shoulders"
+    ],
+    "category": "strength"
+  },
+  {
+    "name": "DB Bent over row",
+    "muscleGroups": [
+      "back",
+      "lats"
+    ],
+    "category": "strength"
+  },
+  {
+    "name": "SH Cable Row",
+    "muscleGroups": [
+      "back",
+      "lats"
+    ],
+    "category": "strength"
+  },
+  {
+    "name": "Push ups",
+    "muscleGroups": [
+      "chest",
+      "triceps",
+      "core"
+    ],
+    "category": "strength"
+  },
+  {
+    "name": "Cable Abduction",
+    "muscleGroups": [
+      "abductors",
+      "glutes"
+    ],
+    "category": "strength"
+  },
+  {
+    "name": "Cable Adduction",
+    "muscleGroups": [
+      "adductors"
+    ],
+    "category": "strength"
+  },
+  {
+    "name": "Cable wood chopper",
+    "muscleGroups": [
+      "other"
+    ],
+    "category": "strength"
+  },
+  {
+    "name": "DB row",
+    "muscleGroups": [
+      "back",
+      "lats"
+    ],
+    "category": "strength"
+  },
+  {
+    "name": "Russian twist",
+    "muscleGroups": [
+      "obliques",
+      "abs"
+    ],
+    "category": "strength"
+  },
+  {
+    "name": "DB bicep curls",
+    "muscleGroups": [
+      "biceps"
+    ],
+    "category": "strength"
+  },
+  {
+    "name": "Machine bicep curls",
+    "muscleGroups": [
+      "biceps"
+    ],
+    "category": "strength"
+  },
+  {
+    "name": "Machine Tricep Extension",
+    "muscleGroups": [
+      "triceps"
+    ],
+    "category": "strength"
+  },
+  {
+    "name": "Leg press",
+    "muscleGroups": [
+      "quadriceps",
+      "glutes"
+    ],
+    "category": "strength"
+  },
+  {
+    "name": "Calf on Leg press machine",
+    "muscleGroups": [
+      "quadriceps",
+      "glutes",
+      "calves"
+    ],
+    "category": "strength"
+  },
+  {
+    "name": "DB Calf raises",
+    "muscleGroups": [
+      "calves"
+    ],
+    "category": "strength"
+  },
+  {
+    "name": "Rear delt cable machine",
+    "muscleGroups": [
+      "rear delts",
+      "shoulders"
+    ],
+    "category": "strength"
+  },
+  {
+    "name": "Cable lumberjack",
+    "muscleGroups": [
+      "obliques",
+      "core"
+    ],
+    "category": "strength"
+  },
+  {
+    "name": "Cable bicep curls",
+    "muscleGroups": [
+      "biceps"
+    ],
+    "category": "strength"
+  },
+  {
+    "name": "Squats",
+    "muscleGroups": [
+      "quadriceps",
+      "glutes",
+      "core"
+    ],
+    "category": "strength"
+  },
+  {
+    "name": "Tricep Extension machine",
+    "muscleGroups": [
+      "triceps"
+    ],
+    "category": "strength"
+  },
+  {
+    "name": "Biceps curls machine",
+    "muscleGroups": [
+      "other"
+    ],
+    "category": "strength"
+  },
+  {
+    "name": "Wide grip rows",
+    "muscleGroups": [
+      "back",
+      "lats"
+    ],
+    "category": "strength"
+  },
+  {
+    "name": "Incline DB Bench press",
+    "muscleGroups": [
+      "chest",
+      "triceps",
+      "shoulders"
+    ],
+    "category": "strength"
+  },
+  {
+    "name": "DB lat raises",
+    "muscleGroups": [
+      "other"
+    ],
+    "category": "strength"
+  },
+  {
+    "name": "Cable Biceps curls",
+    "muscleGroups": [
+      "other"
+    ],
+    "category": "strength"
+  },
+  {
+    "name": "DB side raises",
+    "muscleGroups": [
+      "other"
+    ],
+    "category": "strength"
+  },
+  {
+    "name": "Hamstring curls",
+    "muscleGroups": [
+      "hamstrings"
+    ],
+    "category": "strength"
+  },
+  {
+    "name": "Neutral grip rows",
+    "muscleGroups": [
+      "back",
+      "lats"
+    ],
+    "category": "strength"
+  }
+]

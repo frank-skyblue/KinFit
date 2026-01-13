@@ -9,7 +9,10 @@
     "dev": "nodemon",
     "build": "npx tsc",
     "serve": "node dist/app.js",
-    "seed": "ts-node ./src/seedExercises.ts"
+    "seed": "ts-node ./src/seedExercises.ts",
+    "parse-journal": "ts-node ./src/scripts/parseGymJournal.ts",
+    "seed-journal": "ts-node ./src/scripts/seedFromJournal.ts",
+    "seed-journal:dry": "ts-node ./src/scripts/seedFromJournal.ts --dry-run"
   },
   "author": "",
   "license": "ISC",
