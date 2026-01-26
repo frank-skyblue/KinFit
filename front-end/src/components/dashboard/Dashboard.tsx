@@ -31,153 +31,127 @@ const Dashboard = () => {
 
   return (
     <Layout>
-      <div className="space-y-8">
-        {/* Welcome Section */}
-        <div className="bg-white rounded-kin-lg shadow-kin-medium p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold font-montserrat text-kin-navy mb-2">
-                Welcome back, {user?.displayName}! 👋
-              </h1>
-              <p className="text-kin-teal font-inter">
-                Ready to crush your fitness goals today?
+      <div className="space-y-4">
+        {/* Welcome Header - Compact */}
+        <div className="flex items-center justify-between">
+          <h1 className="text-xl font-semibold font-montserrat text-kin-navy">
+            Hi, {user?.displayName?.split(' ')[0] || 'there'}!
+          </h1>
+          <Link
+            to="/workouts/new"
+            className="bg-kin-coral text-white rounded-kin-sm font-semibold font-montserrat py-2 px-4 text-sm hover:bg-kin-coral-600 shadow-kin-soft transition flex items-center gap-2"
+            aria-label="Start new workout"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+            </svg>
+            New Workout
+          </Link>
+        </div>
+
+        {/* Quick Actions - Prominent */}
+        <div className="grid grid-cols-2 gap-3">
+          <Link
+            to="/workouts/new"
+            className="bg-white p-4 rounded-kin-lg shadow-kin-soft border-2 border-kin-coral-200 hover:bg-kin-coral-50 transition text-center"
+            aria-label="Log a workout"
+          >
+            <span className="text-2xl block mb-1">💪</span>
+            <h3 className="font-semibold font-montserrat text-kin-navy text-sm">Log Workout</h3>
+          </Link>
+          <Link
+            to="/exercises"
+            className="bg-white p-4 rounded-kin-lg shadow-kin-soft border-2 border-kin-teal-200 hover:bg-kin-teal-50 transition text-center"
+            aria-label="Browse exercises"
+          >
+            <span className="text-2xl block mb-1">🏋️</span>
+            <h3 className="font-semibold font-montserrat text-kin-navy text-sm">Exercises</h3>
+          </Link>
+        </div>
+
+        {/* Stats Row - Condensed */}
+        <div className="bg-white rounded-kin-lg shadow-kin-soft p-3">
+          <div className="flex items-center justify-around text-center">
+            <div className="flex-1">
+              <p className="text-xl font-bold font-montserrat text-kin-navy">
+                {user?.totalWorkouts || 0}
               </p>
+              <p className="text-xs font-inter text-kin-stone-500">Workouts</p>
             </div>
-            <Link
-              to="/workouts/new"
-              className="bg-kin-coral text-white rounded-kin-sm font-semibold font-montserrat py-3 px-6 hover:bg-kin-coral-600 shadow-kin-soft hover:shadow-kin-medium transition"
-            >
-              New Workout
-            </Link>
-          </div>
-        </div>
-
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-white rounded-kin-lg shadow-kin-medium p-6">
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-kin-coral-100 rounded-kin-sm flex items-center justify-center">
-                <span className="text-2xl">💪</span>
-              </div>
-              <div>
-                <p className="text-sm font-inter text-kin-teal">Total Workouts</p>
-                <p className="text-2xl font-bold font-montserrat text-kin-navy">
-                  {user?.totalWorkouts || 0}
-                </p>
-              </div>
+            <div className="w-px h-8 bg-kin-stone-200" />
+            <div className="flex-1">
+              <p className="text-xl font-bold font-montserrat text-kin-coral">
+                {user?.currentStreak || 0}
+              </p>
+              <p className="text-xs font-inter text-kin-stone-500">Day Streak</p>
             </div>
-          </div>
-
-          <div className="bg-white rounded-kin-lg shadow-kin-medium p-6">
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-kin-teal-100 rounded-kin-sm flex items-center justify-center">
-                <span className="text-2xl">🔥</span>
-              </div>
-              <div>
-                <p className="text-sm font-inter text-kin-teal">Current Streak</p>
-                <p className="text-2xl font-bold font-montserrat text-kin-navy">
-                  {user?.currentStreak || 0} days
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-kin-lg shadow-kin-medium p-6">
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-kin-coral-100 rounded-kin-sm flex items-center justify-center">
-                <span className="text-2xl">⚖️</span>
-              </div>
-              <div>
-                <p className="text-sm font-inter text-kin-teal">Units</p>
-                <p className="text-2xl font-bold font-montserrat text-kin-navy">
-                  {user?.units || 'lbs'}
-                </p>
-              </div>
+            <div className="w-px h-8 bg-kin-stone-200" />
+            <div className="flex-1">
+              <p className="text-xl font-bold font-montserrat text-kin-teal">
+                {user?.units || 'lbs'}
+              </p>
+              <p className="text-xs font-inter text-kin-stone-500">Units</p>
             </div>
           </div>
         </div>
 
-        {/* Recent Workouts */}
-        <div className="bg-white rounded-kin-lg shadow-kin-medium p-6">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold font-montserrat text-kin-navy">
+        {/* Recent Workouts - Compact */}
+        <div className="bg-white rounded-kin-lg shadow-kin-soft p-4">
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-base font-semibold font-montserrat text-kin-navy">
               Recent Workouts
             </h2>
             <Link
               to="/workouts"
-              className="text-kin-coral font-semibold font-inter hover:text-kin-coral-600 transition"
+              className="text-kin-coral text-sm font-medium font-inter hover:text-kin-coral-600 transition"
+              aria-label="View all workouts"
             >
-              View All →
+              View All
             </Link>
           </div>
 
           {isLoading ? (
-            <div className="text-center py-8">
-              <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-kin-coral border-r-transparent"></div>
+            <div className="text-center py-6">
+              <div className="inline-block h-6 w-6 animate-spin rounded-full border-3 border-solid border-kin-coral border-r-transparent" />
             </div>
           ) : workouts.length === 0 ? (
-            <div className="text-center py-12">
-              <p className="text-kin-teal font-inter mb-4">No workouts yet. Start tracking!</p>
+            <div className="text-center py-6">
+              <p className="text-sm text-kin-stone-500 font-inter mb-3">No workouts yet</p>
               <Link
                 to="/workouts/new"
-                className="inline-block bg-kin-coral text-white rounded-kin-sm font-semibold font-montserrat py-2 px-6 hover:bg-kin-coral-600 shadow-kin-soft hover:shadow-kin-medium transition"
+                className="inline-block bg-kin-coral text-white rounded-kin-sm font-medium font-montserrat py-2 px-4 text-sm hover:bg-kin-coral-600 transition"
               >
                 Log Your First Workout
               </Link>
             </div>
           ) : (
-            <div className="space-y-4">
-              {workouts.map((workout) => (
+            <div className="space-y-2">
+              {workouts.slice(0, 3).map((workout) => (
                 <Link
                   key={workout._id}
                   to={`/workouts/${workout._id}`}
-                  className="block p-4 border border-kin-stone-200 rounded-kin-sm hover:shadow-kin-soft hover:border-kin-coral-200 transition"
+                  className="block p-3 bg-kin-stone-50 rounded-kin-sm hover:bg-kin-stone-100 transition"
                 >
                   <div className="flex items-center justify-between">
-                    <div>
-                      <h3 className="font-semibold font-montserrat text-kin-navy">
+                    <div className="min-w-0 flex-1">
+                      <h3 className="font-medium font-montserrat text-kin-navy text-sm truncate">
                         {workout.title || 'Workout Session'}
                       </h3>
-                      <p className="text-sm text-kin-teal font-inter">
+                      <p className="text-xs text-kin-stone-500 font-inter">
                         {formatDate(workout.date)} • {workout.exercises.length} exercises
                       </p>
                     </div>
-                    <div className="text-right">
-                      <p className="text-sm font-inter text-kin-teal">Total Volume</p>
-                      <p className="font-bold font-montserrat text-kin-navy">
-                        {workout.totalVolume?.toLocaleString() || 0} {user?.units || 'lbs'}
+                    <div className="text-right ml-3">
+                      <p className="font-semibold font-montserrat text-kin-navy text-sm">
+                        {workout.totalVolume?.toLocaleString() || 0}
                       </p>
+                      <p className="text-xs text-kin-stone-500">{user?.units || 'lbs'}</p>
                     </div>
                   </div>
                 </Link>
               ))}
             </div>
           )}
-        </div>
-
-        {/* Quick Actions */}
-        <div className="bg-white rounded-kin-lg shadow-kin-medium p-6">
-          <h2 className="text-2xl font-bold font-montserrat text-kin-navy mb-6">
-            Quick Actions
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Link
-              to="/workouts/new"
-              className="p-4 border-2 border-kin-coral-200 rounded-kin-sm hover:bg-kin-coral-50 transition text-center"
-            >
-              <span className="text-3xl block mb-2">💪</span>
-              <h3 className="font-semibold font-montserrat text-kin-navy">Log Workout</h3>
-              <p className="text-sm text-kin-teal font-inter">Track your training session</p>
-            </Link>
-            <Link
-              to="/exercises"
-              className="p-4 border-2 border-kin-teal-200 rounded-kin-sm hover:bg-kin-teal-50 transition text-center"
-            >
-              <span className="text-3xl block mb-2">🏋️</span>
-              <h3 className="font-semibold font-montserrat text-kin-navy">Exercise Library</h3>
-              <p className="text-sm text-kin-teal font-inter">Browse available exercises</p>
-            </Link>
-          </div>
         </div>
       </div>
     </Layout>

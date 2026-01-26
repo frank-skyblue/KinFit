@@ -9,6 +9,13 @@ export interface IUser extends Document {
   bio?: string;
   fitnessGoals?: string;
   units: 'lbs' | 'kg';
+  // Personal info
+  birthdate?: Date;
+  gender?: 'male' | 'female' | 'other' | 'prefer_not_to_say';
+  height?: number; // in cm
+  weight?: number; // in user's preferred units (lbs or kg)
+  activityLevel?: 'sedentary' | 'light' | 'moderate' | 'active' | 'very_active';
+  // Stats
   totalWorkouts: number;
   currentStreak: number;
   settings: {
@@ -70,6 +77,27 @@ const userSchema = new Schema<IUser>(
       type: String,
       enum: ['lbs', 'kg'],
       default: 'lbs',
+    },
+    birthdate: {
+      type: Date,
+    },
+    gender: {
+      type: String,
+      enum: ['male', 'female', 'other', 'prefer_not_to_say'],
+    },
+    height: {
+      type: Number, // in cm
+      min: 0,
+      max: 300,
+    },
+    weight: {
+      type: Number, // in user's preferred units
+      min: 0,
+      max: 1000,
+    },
+    activityLevel: {
+      type: String,
+      enum: ['sedentary', 'light', 'moderate', 'active', 'very_active'],
     },
     totalWorkouts: {
       type: Number,

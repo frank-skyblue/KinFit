@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="64" fill="#0D9488"/>
+  <g fill="#FEFCE8">
+    <!-- Dumbbell icon -->
+    <rect x="196" y="136" width="120" height="200" rx="12"/>
+    <rect x="136" y="176" width="60" height="120" rx="10"/>
+    <rect x="316" y="176" width="60" height="120" rx="10"/>
+    <rect x="106" y="196" width="40" height="80" rx="8"/>
+    <rect x="366" y="196" width="40" height="80" rx="8"/>
+  </g>
+  <text x="256" y="440" text-anchor="middle" fill="#FEFCE8" font-family="Montserrat, sans-serif" font-size="72" font-weight="700">KIN</text>
+</svg>

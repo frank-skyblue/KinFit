@@ -1,8 +1,13 @@
 import axios from 'axios';
 
-// In production (Vercel), use relative URL. In development, use localhost.
+// API URL configuration:
+// - VITE_API_URL env var: Use if explicitly set
+// - Production: Use relative /api (same domain)
+// - Development with vercel dev: Use relative /api (port 3000)
+// - Development with Express backend: Use localhost:5001
 const API_BASE_URL = import.meta.env.VITE_API_URL || 
-  (import.meta.env.PROD ? '/api' : 'http://localhost:5001/api');
+  (import.meta.env.PROD ? '/api' : 
+    (window.location.port === '3000' ? '/api' : 'http://localhost:5001/api'));
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -51,9 +56,39 @@ export interface User {
   email: string;
   displayName: string;
   profilePhoto?: string;
+  bio?: string;
+  fitnessGoals?: string;
   units: 'lbs' | 'kg';
+  birthdate?: string;
+  gender?: 'male' | 'female' | 'other' | 'prefer_not_to_say';
+  height?: number;
+  weight?: number;
+  activityLevel?: 'sedentary' | 'light' | 'moderate' | 'active' | 'very_active';
   totalWorkouts?: number;
   currentStreak?: number;
+  settings?: {
+    defaultWorkoutVisibility: 'private' | 'shared';
+    notifications: {
+      partnerPRs: boolean;
+      partnerWorkouts: boolean;
+      comments: boolean;
+      reactions: boolean;
+    };
+  };
+  createdAt?: string;
+}
+
+export interface ProfileUpdateData {
+  displayName?: string;
+  bio?: string;
+  fitnessGoals?: string;
+  units?: 'lbs' | 'kg';
+  birthdate?: string | null;
+  gender?: 'male' | 'female' | 'other' | 'prefer_not_to_say' | null;
+  height?: number | null;
+  weight?: number | null;
+  activityLevel?: 'sedentary' | 'light' | 'moderate' | 'active' | 'very_active' | null;
+  settings?: User['settings'];
 }
 
 export interface Exercise {
@@ -151,6 +186,17 @@ export const createExercise = async (exercise: { name: string; muscleGroups?: st
 
 export const getExerciseById = async (exerciseId: string) => {
   const response = await api.get(`/exercises/${exerciseId}`);
+  return response.data;
+};
+
+// Profile
+export const getProfile = async () => {
+  const response = await api.get('/profile');
+  return response.data;
+};
+
+export const updateProfile = async (data: ProfileUpdateData) => {
+  const response = await api.put('/profile', data);
   return response.data;
 };
 

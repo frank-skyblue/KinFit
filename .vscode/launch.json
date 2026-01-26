@@ -2,6 +2,17 @@
   "version": "0.2.0",
   "configurations": [
     {
+      "name": "Vercel Dev (API + Frontend)",
+      "type": "node",
+      "request": "launch",
+      "cwd": "${workspaceFolder}",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["vercel", "dev", "--listen", "3000", "--debug"],
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "skipFiles": ["<node_internals>/**", "**/node_modules/**"]
+    },
+    {
       "name": "Debug Backend",
       "type": "node",
       "request": "launch",
@@ -110,6 +121,64 @@
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
       "skipFiles": ["<node_internals>/**", "**/node_modules/**"]
+    },
+    {
+      "name": "PROD: Seed from Journal (Dry Run)",
+      "type": "node",
+      "request": "launch",
+      "cwd": "${workspaceFolder}/back-end",
+      "runtimeArgs": ["-r", "ts-node/register"],
+      "args": [
+        "${workspaceFolder}/back-end/src/scripts/seedFromJournal.ts",
+        "--dry-run"
+      ],
+      "envFile": "${workspaceFolder}/.env.production",
+      "env": {
+        "TS_NODE_PROJECT": "${workspaceFolder}/back-end/tsconfig.json"
+      },
+      "sourceMaps": true,
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "skipFiles": ["<node_internals>/**", "**/node_modules/**"]
+    },
+    {
+      "name": "PROD: Seed from Journal",
+      "type": "node",
+      "request": "launch",
+      "cwd": "${workspaceFolder}/back-end",
+      "runtimeArgs": ["-r", "ts-node/register"],
+      "args": [
+        "${workspaceFolder}/back-end/src/scripts/seedFromJournal.ts",
+        "--user=6976c7316f98bb9614735942"
+      ],
+      "envFile": "${workspaceFolder}/.env.production",
+      "env": {
+        "TS_NODE_PROJECT": "${workspaceFolder}/back-end/tsconfig.json"
+      },
+      "sourceMaps": true,
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "skipFiles": ["<node_internals>/**", "**/node_modules/**"]
+    },
+    {
+      "name": "PROD: Seed from Journal (Clear Existing)",
+      "type": "node",
+      "request": "launch",
+      "cwd": "${workspaceFolder}/back-end",
+      "runtimeArgs": ["-r", "ts-node/register"],
+      "args": [
+        "${workspaceFolder}/back-end/src/scripts/seedFromJournal.ts",
+        "--clear",
+        "--user=YOUR_PROD_USER_ID"
+      ],
+      "envFile": "${workspaceFolder}/.env.production",
+      "env": {
+        "TS_NODE_PROJECT": "${workspaceFolder}/back-end/tsconfig.json"
+      },
+      "sourceMaps": true,
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "skipFiles": ["<node_internals>/**", "**/node_modules/**"]
     }
   ],
   "compounds": [
@@ -121,6 +190,11 @@
     {
       "name": "Start Full Stack",
       "configurations": ["Debug Backend", "Start Frontend"],
+      "stopAll": true
+    },
+    {
+      "name": "Vercel Full Stack",
+      "configurations": ["Vercel Dev (API + Frontend)"],
       "stopAll": true
     }
   ]

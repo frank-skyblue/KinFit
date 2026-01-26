@@ -1,9 +1,9 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { cors } from '../lib/cors';
-import connectDB from '../lib/db';
-import { authenticate } from '../lib/auth';
-import Workout from '../lib/models/Workout';
-import User from '../lib/models/User';
+import { cors } from '../_lib/cors';
+import connectDB from '../_lib/db';
+import { authenticate } from '../_lib/auth';
+import Workout from '../_lib/models/Workout';
+import User from '../_lib/models/User';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (cors(req, res)) return;

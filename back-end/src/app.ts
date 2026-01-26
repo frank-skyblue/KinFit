@@ -6,6 +6,7 @@ import { connectDB } from './services/mongooseService';
 import authRoutes from './routes/authRoutes';
 import workoutRoutes from './routes/workoutRoutes';
 import exerciseRoutes from './routes/exerciseRoutes';
+import profileRoutes from './routes/profileRoutes';
 
 // Load environment variables
 const PORT = process.env.PORT || 5001;
@@ -28,6 +29,7 @@ app.use((req: Request, res: Response, next) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/workouts', workoutRoutes);
 app.use('/api/exercises', exerciseRoutes);
+app.use('/api/profile', profileRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req: Request, res: Response) => {

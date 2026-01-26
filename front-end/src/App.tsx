@@ -8,11 +8,14 @@ import WorkoutList from './components/workouts/WorkoutList';
 import WorkoutDetail from './components/workouts/WorkoutDetail';
 import NewWorkout from './components/workouts/NewWorkout';
 import ExerciseLibrary from './components/exercises/ExerciseLibrary';
+import Profile from './components/profile/Profile';
+import PWAUpdatePrompt from './components/PWAUpdatePrompt';
 
 const App = () => {
   return (
     <Router>
       <AuthProvider>
+        <PWAUpdatePrompt />
         <Routes>
           {/* Public Routes */}
           <Route path="/login" element={<Login />} />
@@ -56,6 +59,14 @@ const App = () => {
             element={
               <ProtectedRoute>
                 <ExerciseLibrary />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute>
+                <Profile />
               </ProtectedRoute>
             }
           />
