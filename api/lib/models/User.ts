@@ -86,28 +86,14 @@ const userSchema = new Schema<IUser>(
         default: 'private',
       },
       notifications: {
-        partnerPRs: {
-          type: Boolean,
-          default: true,
-        },
-        partnerWorkouts: {
-          type: Boolean,
-          default: true,
-        },
-        comments: {
-          type: Boolean,
-          default: true,
-        },
-        reactions: {
-          type: Boolean,
-          default: true,
-        },
+        partnerPRs: { type: Boolean, default: true },
+        partnerWorkouts: { type: Boolean, default: true },
+        comments: { type: Boolean, default: true },
+        reactions: { type: Boolean, default: true },
       },
     },
   },
-  {
-    timestamps: true,
-  }
+  { timestamps: true }
 );
 
 export default mongoose.models.User || mongoose.model<IUser>('User', userSchema);
