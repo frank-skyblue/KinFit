@@ -12,7 +12,6 @@ if (!cached) {
 export const connectDB = async (): Promise<typeof mongoose> => {
   // Return cached connection if available
   if (cached.conn) {
-    console.log('✅ Using cached MongoDB connection');
     return cached.conn;
   }
 
@@ -38,14 +37,3 @@ export const connectDB = async (): Promise<typeof mongoose> => {
 
   return cached.conn;
 };
-
-mongoose.connection.on('disconnected', () => {
-  console.log('⚠️ MongoDB disconnected');
-  cached.conn = null;
-  cached.promise = null;
-});
-
-mongoose.connection.on('error', (error) => {
-  console.error('❌ MongoDB error:', error);
-});
-

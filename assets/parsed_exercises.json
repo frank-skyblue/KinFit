@@ -71,7 +71,7 @@
     "category": "strength"
   },
   {
-    "name": "SH Cable Tricep extension",
+    "name": "Single Hand Cable Tricep extension",
     "muscleGroups": [
       "triceps"
     ],
@@ -214,7 +214,7 @@
     "category": "strength"
   },
   {
-    "name": "SL calf raises",
+    "name": "Single Leg calf raises",
     "muscleGroups": [
       "calves"
     ],
@@ -667,7 +667,7 @@
     "category": "strength"
   },
   {
-    "name": "SL DB Romanian Deadlift",
+    "name": "Single Leg DB Romanian Deadlift",
     "muscleGroups": [
       "back",
       "hamstrings",
@@ -724,14 +724,14 @@
     "category": "strength"
   },
   {
-    "name": "SL Leg Extension",
+    "name": "Single Leg Leg Extension",
     "muscleGroups": [
       "quadriceps"
     ],
     "category": "strength"
   },
   {
-    "name": "SL Leg Curls",
+    "name": "Single Leg Leg Curls",
     "muscleGroups": [
       "hamstrings"
     ],
@@ -755,7 +755,7 @@
     "category": "strength"
   },
   {
-    "name": "SL Romanian Deadlift",
+    "name": "Single Leg Romanian Deadlift",
     "muscleGroups": [
       "back",
       "hamstrings",
@@ -812,7 +812,7 @@
     "category": "strength"
   },
   {
-    "name": "DB SL Romanian Deadlift",
+    "name": "DB Single Leg Romanian Deadlift",
     "muscleGroups": [
       "back",
       "hamstrings",
@@ -879,7 +879,7 @@
     "category": "strength"
   },
   {
-    "name": "SH Cable Row",
+    "name": "Single Hand Cable Row",
     "muscleGroups": [
       "back",
       "lats"

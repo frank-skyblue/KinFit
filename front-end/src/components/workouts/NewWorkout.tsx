@@ -9,6 +9,7 @@ const NewWorkout = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [showExercisePicker, setShowExercisePicker] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingExercises, setIsLoadingExercises] = useState(true);
   const [error, setError] = useState('');
 
   const [workoutData, setWorkoutData] = useState({
@@ -21,11 +22,15 @@ const NewWorkout = () => {
 
   useEffect(() => {
     const fetchExercises = async () => {
+      setIsLoadingExercises(true);
       try {
         const response = await getExercises();
-        setExercises(response.exercises);
+        setExercises(response.exercises || []);
       } catch (error) {
         console.error('Failed to fetch exercises:', error);
+        setExercises([]);
+      } finally {
+        setIsLoadingExercises(false);
       }
     };
     fetchExercises();
@@ -204,21 +209,36 @@ const NewWorkout = () => {
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="w-full px-4 py-3 border border-kin-stone-300 rounded-kin-sm focus:ring-2 focus:ring-kin-coral focus:border-transparent outline-none transition font-inter mb-3"
+                  aria-label="Search exercises"
                 />
                 <div className="max-h-60 overflow-y-auto space-y-2">
-                  {filteredExercises.map((exercise) => (
-                    <button
-                      key={exercise._id}
-                      type="button"
-                      onClick={() => handleAddExercise(exercise)}
-                      className="w-full text-left px-4 py-3 bg-white border border-kin-stone-200 rounded-kin-sm hover:border-kin-coral hover:bg-kin-coral-50 transition"
-                    >
-                      <p className="font-semibold font-inter text-kin-navy">{exercise.name}</p>
-                      <p className="text-sm text-kin-teal font-inter">
-                        {exercise.muscleGroups.join(', ')}
-                      </p>
-                    </button>
-                  ))}
+                  {isLoadingExercises ? (
+                    <div className="text-center py-4 text-kin-teal font-inter">
+                      Loading exercises...
+                    </div>
+                  ) : filteredExercises.length === 0 ? (
+                    <div className="text-center py-4 text-kin-teal font-inter">
+                      {exercises.length === 0
+                        ? 'No exercises found. Run the seed script to populate exercises.'
+                        : 'No exercises match your search.'}
+                    </div>
+                  ) : (
+                    filteredExercises.map((exercise) => (
+                      <button
+                        key={exercise._id}
+                        type="button"
+                        onClick={() => handleAddExercise(exercise)}
+                        className="w-full text-left px-4 py-3 bg-white border border-kin-stone-200 rounded-kin-sm hover:border-kin-coral hover:bg-kin-coral-50 transition"
+                        tabIndex={0}
+                        aria-label={`Add ${exercise.name} to workout`}
+                      >
+                        <p className="font-semibold font-inter text-kin-navy">{exercise.name}</p>
+                        <p className="text-sm text-kin-teal font-inter">
+                          {exercise.muscleGroups.join(', ')}
+                        </p>
+                      </button>
+                    ))
+                  )}
                 </div>
               </div>
             )}

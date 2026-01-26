@@ -17,17 +17,110 @@
       "skipFiles": ["<node_internals>/**", "**/node_modules/**"]
     },
     {
-      "name": "Debug Frontend",
+      "name": "Start Frontend",
+      "type": "node",
+      "request": "launch",
+      "cwd": "${workspaceFolder}/front-end",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev"],
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen"
+    },
+    {
+      "name": "Debug Frontend (Firefox)",
       "type": "firefox",
       "request": "launch",
       "url": "http://localhost:3001",
-      "webRoot": "${workspaceFolder}/front-end/src"
+      "webRoot": "${workspaceFolder}/front-end/src",
+      "preLaunchTask": "Start Frontend Dev Server"
+    },
+    {
+      "name": "Debug Frontend (Chrome)",
+      "type": "chrome",
+      "request": "launch",
+      "url": "http://localhost:3001",
+      "webRoot": "${workspaceFolder}/front-end/src",
+      "preLaunchTask": "Start Frontend Dev Server"
+    },
+    {
+      "name": "Run: Parse Gym Journal",
+      "type": "node",
+      "request": "launch",
+      "cwd": "${workspaceFolder}/back-end",
+      "runtimeArgs": ["-r", "ts-node/register"],
+      "args": ["${workspaceFolder}/back-end/src/scripts/parseGymJournal.ts"],
+      "env": {
+        "TS_NODE_PROJECT": "${workspaceFolder}/back-end/tsconfig.json"
+      },
+      "sourceMaps": true,
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "skipFiles": ["<node_internals>/**", "**/node_modules/**"]
+    },
+    {
+      "name": "Run: Seed from Journal (Dry Run)",
+      "type": "node",
+      "request": "launch",
+      "cwd": "${workspaceFolder}/back-end",
+      "runtimeArgs": ["-r", "ts-node/register"],
+      "args": [
+        "${workspaceFolder}/back-end/src/scripts/seedFromJournal.ts",
+        "--dry-run"
+      ],
+      "env": {
+        "TS_NODE_PROJECT": "${workspaceFolder}/back-end/tsconfig.json"
+      },
+      "sourceMaps": true,
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "skipFiles": ["<node_internals>/**", "**/node_modules/**"]
+    },
+    {
+      "name": "Run: Seed from Journal",
+      "type": "node",
+      "request": "launch",
+      "cwd": "${workspaceFolder}/back-end",
+      "runtimeArgs": ["-r", "ts-node/register"],
+      "args": ["${workspaceFolder}/back-end/src/scripts/seedFromJournal.ts",
+        "--clear",
+        "--user=6976b1c7de98bc91957c7753",
+      ],
+      "env": {
+        "TS_NODE_PROJECT": "${workspaceFolder}/back-end/tsconfig.json"
+      },
+      "sourceMaps": true,
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "skipFiles": ["<node_internals>/**", "**/node_modules/**"]
+    },
+    {
+      "name": "Run: Seed from Journal (Clear Existing)",
+      "type": "node",
+      "request": "launch",
+      "cwd": "${workspaceFolder}/back-end",
+      "runtimeArgs": ["-r", "ts-node/register"],
+      "args": [
+        "${workspaceFolder}/back-end/src/scripts/seedFromJournal.ts",
+        "--clear"
+      ],
+      "env": {
+        "TS_NODE_PROJECT": "${workspaceFolder}/back-end/tsconfig.json"
+      },
+      "sourceMaps": true,
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "skipFiles": ["<node_internals>/**", "**/node_modules/**"]
     }
   ],
   "compounds": [
     {
       "name": "Debug Full Stack",
-      "configurations": ["Debug Backend", "Debug Frontend"],
+      "configurations": ["Debug Backend", "Debug Frontend (Firefox)"],
+      "stopAll": true
+    },
+    {
+      "name": "Start Full Stack",
+      "configurations": ["Debug Backend", "Start Frontend"],
       "stopAll": true
     }
   ]

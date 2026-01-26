@@ -1,0 +1,29 @@
+{
+  "name": "kinfit",
+  "version": "1.0.0",
+  "private": true,
+  "description": "KinFit - Fitness tracking app with workout logging and social features",
+  "scripts": {
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "dev:backend": "cd back-end && npm run dev",
+    "dev:frontend": "cd front-end && npm run dev",
+    "build": "npm install --prefix front-end && npm run build --prefix front-end",
+    "vercel-build": "npm run build"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.2",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.16.1"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/node": "^20.11.16",
+    "@vercel/node": "^3.0.0",
+    "concurrently": "^8.2.2",
+    "typescript": "^5.3.3"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

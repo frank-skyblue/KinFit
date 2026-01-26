@@ -5,6 +5,7 @@ import Login from './components/auth/Login';
 import Signup from './components/auth/Signup';
 import Dashboard from './components/dashboard/Dashboard';
 import WorkoutList from './components/workouts/WorkoutList';
+import WorkoutDetail from './components/workouts/WorkoutDetail';
 import NewWorkout from './components/workouts/NewWorkout';
 import ExerciseLibrary from './components/exercises/ExerciseLibrary';
 
@@ -39,6 +40,14 @@ const App = () => {
             element={
               <ProtectedRoute>
                 <NewWorkout />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/workouts/:workoutId"
+            element={
+              <ProtectedRoute>
+                <WorkoutDetail />
               </ProtectedRoute>
             }
           />
