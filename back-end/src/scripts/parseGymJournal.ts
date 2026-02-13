@@ -351,39 +351,39 @@ const parseExerciseLine = (line: string, exerciseName: string | null): ParsedExe
  * Normalize exercise name for consistency
  */
 const normalizeExerciseName = (name: string): string => {
-  let normalized = name
-    .trim()
-    .replace(/\s+/g, ' ');
-  
-  // Expand common abbreviations (order matters - do specific ones first)
-  const expansions: [RegExp, string][] = [
-    [/\bSL\s+DB\s+RDL\b/gi, 'Single Leg DB Romanian Deadlift'],
-    [/\bDB\s+SL\s+RDL\b/gi, 'DB Single Leg Romanian Deadlift'],
-    [/\bSL\s+RDL\b/gi, 'Single Leg Romanian Deadlift'],
-    [/\bDB\s+RDL\b/gi, 'DB Romanian Deadlift'],
-    [/\bDB\s+BSS\b/gi, 'DB Bulgarian Split Squat'],
-    [/\bSL\s+DB\b/gi, 'Single Leg DB'],
-    [/^RDL$/gi, 'Romanian Deadlift'],
-    [/^DL$/gi, 'Deadlift'],
-    [/^BSS$/gi, 'Bulgarian Split Squat'],
-    [/\bBSS\b/gi, 'Bulgarian Split Squat'],
-    [/\bRDL\b/gi, 'Romanian Deadlift'],
-    [/\bLat\s+PD\b/gi, 'Lat Pulldown'],
-    [/\bLat\s+Pd\b/gi, 'Lat Pulldown'],
-    [/\bPD\b/gi, 'Pulldown'],
-    [/\bExt\b/gi, 'Extension'],
-    [/\bDL\b/gi, 'Deadlift'],
-    [/\bHS\b/gi, 'Hamstring'],
-    [/\bSL\b/gi, 'Single Leg'],
-    [/\bSH\b/gi, 'Single Hand'],
-    [/\bDB\b/gi, 'DB'],
-  ];
+    let normalized = name
+        .trim()
+        .replace(/\s+/g, ' ');
 
-  for (const [pattern, replacement] of expansions) {
-    normalized = normalized.replace(pattern, replacement);
-  }
+    // Expand common abbreviations (order matters - do specific ones first)
+    const expansions: [RegExp, string][] = [
+        [/\bSL\s+DB\s+RDL\b/gi, 'Single Leg DB Romanian Deadlift'],
+        [/\bDB\s+SL\s+RDL\b/gi, 'DB Single Leg Romanian Deadlift'],
+        [/\bSL\s+RDL\b/gi, 'Single Leg Romanian Deadlift'],
+        [/\bDB\s+RDL\b/gi, 'DB Romanian Deadlift'],
+        [/\bDB\s+BSS\b/gi, 'DB Bulgarian Split Squat'],
+        [/\bSL\s+DB\b/gi, 'Single Leg DB'],
+        [/^RDL$/gi, 'Romanian Deadlift'],
+        [/^DL$/gi, 'Deadlift'],
+        [/^BSS$/gi, 'Bulgarian Split Squat'],
+        [/\bBSS\b/gi, 'Bulgarian Split Squat'],
+        [/\bRDL\b/gi, 'Romanian Deadlift'],
+        [/\bLat\s+PD\b/gi, 'Lat Pulldown'],
+        [/\bLat\s+Pd\b/gi, 'Lat Pulldown'],
+        [/\bPD\b/gi, 'Pulldown'],
+        [/\bExt\b/gi, 'Extension'],
+        [/\bDL\b/gi, 'Deadlift'],
+        [/\bHS\b/gi, 'Hamstring'],
+        [/\bSL\b/gi, 'Single Leg'],
+        [/\bSH\b/gi, 'Single Hand'],
+        [/\bDB\b/gi, 'DB'],
+    ];
 
-  return normalized;
+    for (const [pattern, replacement] of expansions) {
+        normalized = normalized.replace(pattern, replacement);
+    }
+
+    return normalized;
 };
 
 /**

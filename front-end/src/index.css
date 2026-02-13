@@ -119,6 +119,17 @@ code {
   background: #4F7A72;
 }
 
+/* Hide number input spinners */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
 /* Smooth transitions for interactive elements */
 button, a, input, textarea, select {
   transition: all 0.2s ease-in-out;

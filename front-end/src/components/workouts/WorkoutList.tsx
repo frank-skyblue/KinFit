@@ -4,6 +4,15 @@ import Layout from '../dashboard/Layout';
 import { getWorkouts, Workout } from '../../services/api';
 import { useAuth } from '../../contexts/AuthContext';
 
+const formatDate = (dateString: string) => {
+  return new Date(dateString).toLocaleDateString('en-US', {
+    weekday: 'short',
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  });
+};
+
 const WorkoutList = () => {
   const { user } = useAuth();
   const [workouts, setWorkouts] = useState<Workout[]>([]);
@@ -27,16 +36,6 @@ const WorkoutList = () => {
 
     fetchWorkouts();
   }, [page]);
-
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', { 
-      weekday: 'short',
-      month: 'short', 
-      day: 'numeric', 
-      year: 'numeric' 
-    });
-  };
 
   return (
     <Layout>

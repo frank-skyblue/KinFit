@@ -2,12 +2,9 @@ import axios from 'axios';
 
 // API URL configuration:
 // - VITE_API_URL env var: Use if explicitly set
-// - Production: Use relative /api (same domain)
-// - Development with vercel dev: Use relative /api (port 3000)
-// - Development with Express backend: Use localhost:5001
-const API_BASE_URL = import.meta.env.VITE_API_URL || 
-  (import.meta.env.PROD ? '/api' : 
-    (window.location.port === '3000' ? '/api' : 'http://localhost:5001/api'));
+// - Otherwise: Always use relative /api so the Vite proxy (or production reverse-proxy) handles routing.
+//   This ensures the app works from any device on the network (phone, tablet, etc.)
+const API_BASE_URL = import.meta.env.VITE_API_URL || '/api';
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -100,6 +97,13 @@ export interface Exercise {
   description?: string;
 }
 
+export interface SetEntry {
+  weightValue?: number;
+  weightType: 'e' | 'a' | 'bw';
+  reps: number;
+  sets: number;
+}
+
 export interface ExerciseEntry {
   exerciseId: string;
   exerciseName: string;
@@ -107,9 +111,36 @@ export interface ExerciseEntry {
   weightType: 'e' | 'a' | 'bw';
   reps: number;
   sets: number;
+  setEntries?: SetEntry[];
   notes?: string;
   orderIndex: number;
 }
+
+/** Resolve set entries from an exercise, falling back to legacy single-line fields */
+export const getSetEntries = (exercise: ExerciseEntry): SetEntry[] => {
+  if (exercise.setEntries && exercise.setEntries.length > 0) return exercise.setEntries;
+  return [{ weightValue: exercise.weightValue, weightType: exercise.weightType, reps: exercise.reps, sets: exercise.sets }];
+};
+
+/** Format a single set entry as compact notation */
+export const formatSetNotation = (entry: SetEntry): string => {
+  if (entry.weightType === 'bw') return `bw × ${entry.reps} × ${entry.sets}`;
+  return `${entry.weightValue || 0}${entry.weightType} × ${entry.reps} × ${entry.sets}`;
+};
+
+/** Normalize an exercise before saving — sets legacy fields from first setEntry for backward compat */
+export const normalizeExerciseForSave = (exercise: ExerciseEntry): ExerciseEntry => {
+  const entries = getSetEntries(exercise);
+  const first = entries[0];
+  return {
+    ...exercise,
+    weightValue: first.weightValue,
+    weightType: first.weightType,
+    reps: first.reps,
+    sets: first.sets,
+    setEntries: entries,
+  };
+};
 
 export interface Workout {
   _id?: string;

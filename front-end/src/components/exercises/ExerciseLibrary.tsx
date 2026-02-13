@@ -4,7 +4,6 @@ import { Exercise, getExercises, createExercise } from '../../services/api';
 
 const ExerciseLibrary = () => {
   const [exercises, setExercises] = useState<Exercise[]>([]);
-  const [filteredExercises, setFilteredExercises] = useState<Exercise[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
@@ -19,39 +18,33 @@ const ExerciseLibrary = () => {
     description: '',
   });
 
-  useEffect(() => {
-    fetchExercises();
-  }, []);
-
-  useEffect(() => {
-    let filtered = exercises;
-
-    if (searchTerm) {
-      filtered = filtered.filter((ex) =>
-        ex.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        ex.muscleGroups.some(mg => mg.toLowerCase().includes(searchTerm.toLowerCase()))
-      );
-    }
-
-    if (categoryFilter !== 'all') {
-      filtered = filtered.filter((ex) => ex.category === categoryFilter);
-    }
-
-    setFilteredExercises(filtered);
-  }, [exercises, searchTerm, categoryFilter]);
-
   const fetchExercises = async () => {
     setIsLoading(true);
     try {
       const response = await getExercises();
       setExercises(response.exercises);
-      setFilteredExercises(response.exercises);
-    } catch (error) {
-      console.error('Failed to fetch exercises:', error);
+    } catch (err) {
+      console.error('Failed to fetch exercises:', err);
     } finally {
       setIsLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchExercises();
+  }, []);
+
+  // Derived — no state needed
+  const filteredExercises = exercises.filter((ex) => {
+    const matchesSearch =
+      !searchTerm ||
+      ex.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      ex.muscleGroups.some((mg) => mg.toLowerCase().includes(searchTerm.toLowerCase()));
+
+    const matchesCategory = categoryFilter === 'all' || ex.category === categoryFilter;
+
+    return matchesSearch && matchesCategory;
+  });
 
   const handleCreateExercise = async (e: React.FormEvent) => {
     e.preventDefault();

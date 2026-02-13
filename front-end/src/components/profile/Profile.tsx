@@ -3,6 +3,18 @@ import { useNavigate } from 'react-router-dom';
 import { getProfile, updateProfile, User, ProfileUpdateData } from '../../services/api';
 import Layout from '../dashboard/Layout';
 
+const calculateAge = (birthdate: string | undefined | null): number | null => {
+  if (!birthdate) return null;
+  const today = new Date();
+  const birth = new Date(birthdate);
+  let age = today.getFullYear() - birth.getFullYear();
+  const monthDiff = today.getMonth() - birth.getMonth();
+  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+    age--;
+  }
+  return age;
+};
+
 const Profile = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState<User | null>(null);
@@ -94,18 +106,6 @@ const Profile = () => {
     } finally {
       setIsSaving(false);
     }
-  };
-
-  const calculateAge = (birthdate: string | undefined | null): number | null => {
-    if (!birthdate) return null;
-    const today = new Date();
-    const birth = new Date(birthdate);
-    let age = today.getFullYear() - birth.getFullYear();
-    const monthDiff = today.getMonth() - birth.getMonth();
-    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
-      age--;
-    }
-    return age;
   };
 
   if (isLoading) {
