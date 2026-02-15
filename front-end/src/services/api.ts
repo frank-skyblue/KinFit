@@ -307,13 +307,25 @@ export const deleteExercise = async (exerciseId: string) => {
 };
 
 // Analytics
-export interface BodyPartVolume {
+export interface BodyPartVolumeSets {
   name: string;
+  unit: 'sets';
   setsThisWeek: number;
   targetSets: number;
   daysSinceLastTrained: number | null;
   lastTrainedDate: string | null;
 }
+
+export interface BodyPartVolumeMinutes {
+  name: string;
+  unit: 'minutes';
+  minutesThisWeek: number;
+  targetMinutes: number;
+  daysSinceLastTrained: number | null;
+  lastTrainedDate: string | null;
+}
+
+export type BodyPartVolume = BodyPartVolumeSets | BodyPartVolumeMinutes;
 
 export interface VolumeSummaryResponse {
   bodyParts: BodyPartVolume[];

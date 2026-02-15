@@ -18,7 +18,8 @@ export const MUSCLE_GROUP_TO_PARENT: Record<string, string> = {
   abs: 'core',
   obliques: 'core',
   cardio: 'cardio',
-  'full body': 'full body',
+  'full body': 'mobility',
+  mobility: 'mobility',
 };
 
 export const PARENT_BODY_PARTS_ORDER = [
@@ -29,7 +30,7 @@ export const PARENT_BODY_PARTS_ORDER = [
   'legs',
   'core',
   'cardio',
-  'full body',
+  'mobility',
 ] as const;
 
 export const getParentBodyPart = (muscleGroup: string): string =>

@@ -1,6 +1,11 @@
 import { useState, useEffect, useRef } from 'react';
 import { Exercise } from '../../services/api';
 import { getApiErrorMessage } from '../../utils/errors';
+import {
+  ALLOWED_MUSCLE_GROUPS,
+  MUSCLE_GROUP_SECTIONS,
+  formatMuscleGroupLabel,
+} from '../../constants/muscleGroups';
 import ErrorAlert from '../common/ErrorAlert';
 
 type ExerciseCategory = 'strength' | 'cardio' | 'flexibility' | 'other';
@@ -25,7 +30,17 @@ const ExerciseFormModal = ({ exercise, onSave, onClose }: ExerciseFormModalProps
   const [error, setError] = useState('');
 
   const [name, setName] = useState(exercise ? exercise.name : '');
-  const [muscleGroups, setMuscleGroups] = useState(exercise ? exercise.muscleGroups.join(', ') : '');
+  const [muscleGroups, setMuscleGroups] = useState<string[]>(() => {
+    if (!exercise || !exercise.muscleGroups?.length) return [];
+    const allowed = new Set(ALLOWED_MUSCLE_GROUPS);
+    const mapped = exercise.muscleGroups
+      .map((g) => {
+        const v = String(g).trim().toLowerCase();
+        return v === 'full body' ? 'mobility' : v;
+      })
+      .filter((g) => g && allowed.has(g as typeof ALLOWED_MUSCLE_GROUPS[number]));
+    return [...new Set(mapped)].sort();
+  });
   const [category, setCategory] = useState<ExerciseCategory>(
     (exercise ? exercise.category : 'strength') as ExerciseCategory
   );
@@ -71,16 +86,18 @@ const ExerciseFormModal = ({ exercise, onSave, onClose }: ExerciseFormModalProps
     if (e.target === e.currentTarget && !isSaving) onClose();
   };
 
+  const handleMuscleGroupToggle = (value: string) => {
+    setMuscleGroups((prev) =>
+      prev.includes(value) ? prev.filter((g) => g !== value) : [...prev, value].sort()
+    );
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setIsSaving(true);
     try {
-      const groups = muscleGroups
-        .split(',')
-        .map((mg) => mg.trim())
-        .filter(Boolean);
-      await onSave({ name, muscleGroups: groups, category, description });
+      await onSave({ name, muscleGroups: [...muscleGroups].sort(), category, description });
     } catch (err: unknown) {
       setError(getApiErrorMessage(err) || 'Something went wrong');
       setIsSaving(false);
@@ -153,14 +170,49 @@ const ExerciseFormModal = ({ exercise, onSave, onClose }: ExerciseFormModalProps
             <label className="block text-sm font-medium font-inter text-kin-navy mb-1.5">
               Muscle Groups
             </label>
-            <input
-              type="text"
-              value={muscleGroups}
-              onChange={(e) => setMuscleGroups(e.target.value)}
-              className="w-full px-4 py-2.5 border border-kin-stone-300 rounded-kin-sm focus:ring-2 focus:ring-kin-coral focus:border-transparent outline-none transition font-inter"
-              placeholder="e.g., chest, triceps, shoulders"
-            />
-            <p className="text-xs text-kin-teal font-inter mt-1">Comma-separated</p>
+            {muscleGroups.length > 0 && (
+              <div className="flex flex-wrap gap-1.5 mb-2">
+                {muscleGroups.map((value) => (
+                  <span
+                    key={value}
+                    className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium font-inter bg-kin-coral-100 text-kin-coral-800"
+                  >
+                    {formatMuscleGroupLabel(value)}
+                  </span>
+                ))}
+              </div>
+            )}
+            <div className="max-h-44 overflow-y-auto border border-kin-stone-300 rounded-kin-sm p-3 bg-kin-stone-50">
+              <div className="space-y-4">
+                {MUSCLE_GROUP_SECTIONS.map(({ label, values }) => (
+                  <div key={label}>
+                    <p className="text-xs font-semibold font-inter text-kin-stone-500 uppercase tracking-wide mb-2">
+                      {label}
+                    </p>
+                    <div className="grid grid-cols-2 gap-x-4 gap-y-1.5">
+                      {values.map((value) => (
+                        <label
+                          key={value}
+                          className="flex items-center gap-2 cursor-pointer font-inter text-sm text-kin-navy hover:bg-kin-stone-100 rounded px-2 py-1 -mx-2 -my-1"
+                        >
+                          <input
+                            type="checkbox"
+                            checked={muscleGroups.includes(value)}
+                            onChange={() => handleMuscleGroupToggle(value)}
+                            className="rounded border-kin-stone-400 text-kin-coral focus:ring-kin-coral"
+                            aria-label={`Select ${formatMuscleGroupLabel(value)}`}
+                          />
+                          <span>{formatMuscleGroupLabel(value)}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <p className="text-xs text-kin-teal font-inter mt-1">
+              Select all that apply
+            </p>
           </div>
 
           <div>

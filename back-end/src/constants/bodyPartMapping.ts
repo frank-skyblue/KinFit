@@ -7,7 +7,7 @@
  * - Legs: quadriceps, hamstrings, glutes, calves, legs (generic)
  * - Core: abs, obliques, core (generic)
  * - Chest, Back, Shoulders stay as-is
- * - Cardio and Full Body are their own categories
+ * - Cardio and Mobility are their own categories
  */
 export const MUSCLE_GROUP_TO_PARENT: Record<string, string> = {
   chest: 'chest',
@@ -25,7 +25,8 @@ export const MUSCLE_GROUP_TO_PARENT: Record<string, string> = {
   abs: 'core',
   obliques: 'core',
   cardio: 'cardio',
-  'full body': 'full body',
+  'full body': 'mobility',
+  mobility: 'mobility',
 };
 
 /** Canonical display order for parent body parts in the volume summary */
@@ -37,7 +38,7 @@ export const PARENT_BODY_PARTS_ORDER = [
   'legs',
   'core',
   'cardio',
-  'full body',
+  'mobility',
 ] as const;
 
 /** Resolve a granular muscle group to its parent. Unknown groups pass through. */

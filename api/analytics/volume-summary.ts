@@ -30,10 +30,21 @@ const countSets = (exercise: {
   return isStrength ? (exercise.sets || 1) : 1;
 };
 
+/** Sum duration (minutes) from setEntries. Used for cardio/mobility. */
+const countMinutes = (exercise: {
+  setEntries?: { duration?: number }[];
+}): number => {
+  if (!exercise.setEntries || exercise.setEntries.length === 0) return 0;
+  return exercise.setEntries.reduce((sum, entry) => sum + (entry.duration || 0), 0);
+};
+
 interface BodyPartAccumulator {
   sets: number;
+  minutes: number;
   lastTrainedDate: Date | null;
 }
+
+const MINUTE_BODY_PARTS = new Set(['cardio', 'mobility']);
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (cors(req, res)) return;
@@ -73,7 +84,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       muscleGroupMap.set((ex as any)._id.toString(), (ex as any).muscleGroups);
     }
 
-    // 4. Aggregate sets per parent body part + track last trained date
+    // 4. Aggregate sets (strength) or minutes (cardio/mobility) per parent body part
     const bodyPartMap = new Map<string, BodyPartAccumulator>();
 
     for (const workout of workouts) {
@@ -81,12 +92,21 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
       for (const entry of (workout as any).exercises) {
         const groups = muscleGroupMap.get(entry.exerciseId.toString()) || [];
-        const sets = countSets(entry);
 
         for (const granularGroup of groups) {
           const parent = getParentBodyPart(granularGroup);
-          const current = bodyPartMap.get(parent) || { sets: 0, lastTrainedDate: null };
-          current.sets += sets;
+          if (!parent) continue;
+          const current = bodyPartMap.get(parent) || {
+            sets: 0,
+            minutes: 0,
+            lastTrainedDate: null,
+          };
+
+          if (MINUTE_BODY_PARTS.has(parent)) {
+            current.minutes += countMinutes(entry);
+          } else {
+            current.sets += countSets(entry);
+          }
 
           if (!current.lastTrainedDate || workoutDate > current.lastTrainedDate) {
             current.lastTrainedDate = workoutDate;
@@ -97,21 +117,42 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       }
     }
 
-    // 5. Build response: consistent set of parent body parts in canonical order
+    // 5. Build response: sets for strength body parts, minutes for cardio/mobility
     const targetSetsPerWeek = 10;
+    const targetMinutesCardio = 150;
+    const targetMinutesMobility = 60;
 
     const bodyParts = PARENT_BODY_PARTS_ORDER.map((name) => {
-      const data = bodyPartMap.get(name) || { sets: 0, lastTrainedDate: null };
+      const data = bodyPartMap.get(name) || {
+        sets: 0,
+        minutes: 0,
+        lastTrainedDate: null,
+      };
       const daysSinceLastTrained = data.lastTrainedDate
         ? Math.floor((now.getTime() - data.lastTrainedDate.getTime()) / (24 * 60 * 60 * 1000))
         : null;
 
-      return {
+      const base = {
         name,
-        setsThisWeek: data.sets,
-        targetSets: targetSetsPerWeek,
         daysSinceLastTrained,
         lastTrainedDate: data.lastTrainedDate ? data.lastTrainedDate.toISOString() : null,
+      };
+
+      if (MINUTE_BODY_PARTS.has(name)) {
+        const target =
+          name === 'cardio' ? targetMinutesCardio : targetMinutesMobility;
+        return {
+          ...base,
+          unit: 'minutes' as const,
+          minutesThisWeek: data.minutes,
+          targetMinutes: target,
+        };
+      }
+      return {
+        ...base,
+        unit: 'sets' as const,
+        setsThisWeek: data.sets,
+        targetSets: targetSetsPerWeek,
       };
     });
 

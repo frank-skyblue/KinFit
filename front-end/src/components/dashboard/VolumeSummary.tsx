@@ -13,7 +13,7 @@ const formatBodyPartName = (name: string): string =>
 /**
  * Color decay algorithm:
  * Two factors determine the color —
- *   1. Volume ratio (setsThisWeek / targetSets) determines the hue
+ *   1. Volume ratio (actual / target) determines the hue
  *   2. Days since last trained determines the intensity/saturation
  *
  * Hue tiers:
@@ -25,11 +25,11 @@ const formatBodyPartName = (name: string): string =>
  * Freshness: saturation and lightness fade as days since last trained increases
  */
 const getVolumeColor = (
-  setsThisWeek: number,
-  targetSets: number,
+  actual: number,
+  target: number,
   daysSinceLastTrained: number | null
 ): { bg: string; text: string; border: string } => {
-  const ratio = targetSets > 0 ? setsThisWeek / targetSets : 0;
+  const ratio = target > 0 ? actual / target : 0;
 
   // Freshness factor: 1.0 for today, decays to 0.3 over 7+ days
   const days = daysSinceLastTrained ?? 8;
@@ -151,13 +151,18 @@ const VolumeSummary = () => {
         <h2 className="text-base font-semibold font-montserrat text-kin-navy">
           Weekly Volume
         </h2>
-        <span className="text-xs text-kin-stone-500 font-inter">Sets / Target</span>
+        <span className="text-xs text-kin-stone-500 font-inter">
+          Sets or min / Target
+        </span>
       </div>
 
       <div className="grid grid-cols-2 gap-2">
         {bodyParts.map((bp) => {
-          const colors = getVolumeColor(bp.setsThisWeek, bp.targetSets, bp.daysSinceLastTrained);
-          const isAboveTarget = bp.setsThisWeek >= bp.targetSets;
+          const isMinutes = bp.unit === 'minutes';
+          const actual = isMinutes ? bp.minutesThisWeek : bp.setsThisWeek;
+          const target = isMinutes ? bp.targetMinutes : bp.targetSets;
+          const colors = getVolumeColor(actual, target, bp.daysSinceLastTrained);
+          const isAboveTarget = actual >= target;
 
           return (
             <div
@@ -179,7 +184,9 @@ const VolumeSummary = () => {
                   className="text-xs font-inter whitespace-nowrap font-bold"
                   style={{ color: colors.text }}
                 >
-                  {bp.setsThisWeek}/{bp.targetSets}
+                  {isMinutes
+                    ? `${actual} / ${target} min`
+                    : `${actual}/${target}`}
                 </span>
               </div>
               <div className="flex items-center justify-between mt-1.5">
