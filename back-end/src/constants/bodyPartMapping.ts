@@ -2,10 +2,11 @@
  * Maps granular muscle groups (from exercises) to parent body part categories
  * for a consistent high-level volume view.
  *
+ * Must include all values from front-end ALLOWED_MUSCLE_GROUPS.
  * Based on standard fitness hierarchy:
  * - Arms: biceps, triceps, forearms
- * - Legs: quadriceps, hamstrings, glutes, calves, legs (generic)
- * - Core: abs, obliques, core (generic)
+ * - Legs: legs, quadriceps, hamstrings, glutes, calves, adductors, abductors
+ * - Core: core, abs, obliques
  * - Chest, Back, Shoulders stay as-is
  * - Cardio and Mobility are their own categories
  */
@@ -21,11 +22,12 @@ export const MUSCLE_GROUP_TO_PARENT: Record<string, string> = {
   hamstrings: 'legs',
   glutes: 'legs',
   calves: 'legs',
+  adductors: 'legs',
+  abductors: 'legs',
   core: 'core',
   abs: 'core',
   obliques: 'core',
   cardio: 'cardio',
-  'full body': 'mobility',
   mobility: 'mobility',
 };
 

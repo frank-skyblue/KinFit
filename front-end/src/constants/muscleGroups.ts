@@ -2,6 +2,12 @@
  * Allowed muscle groups for exercises. Matches body part mappings.
  * No free text — exercises must use one of these values.
  * Excludes "full body" (replaced by mobility).
+ *
+ * Cross-reference with bodyPartMapping (api + back-end):
+ * - arms:    biceps, triceps, forearms
+ * - legs:    legs, quadriceps, hamstrings, glutes, calves, adductors, abductors
+ * - core:    core, abs, obliques
+ * - as-is:   chest, back, shoulders, cardio, mobility
  */
 export const ALLOWED_MUSCLE_GROUPS = [
   'chest',
@@ -15,6 +21,8 @@ export const ALLOWED_MUSCLE_GROUPS = [
   'hamstrings',
   'glutes',
   'calves',
+  'adductors',
+  'abductors',
   'core',
   'abs',
   'obliques',
@@ -27,7 +35,7 @@ export type MuscleGroup = (typeof ALLOWED_MUSCLE_GROUPS)[number];
 /** Grouped for better scanability in the form */
 export const MUSCLE_GROUP_SECTIONS: { label: string; values: readonly string[] }[] = [
   { label: 'Upper', values: ['chest', 'back', 'shoulders', 'biceps', 'triceps', 'forearms'] },
-  { label: 'Lower', values: ['legs', 'quadriceps', 'hamstrings', 'glutes', 'calves'] },
+  { label: 'Lower', values: ['legs', 'quadriceps', 'hamstrings', 'glutes', 'calves', 'adductors', 'abductors'] },
   { label: 'Core', values: ['core', 'abs', 'obliques'] },
   { label: 'Other', values: ['cardio', 'mobility'] },
 ];

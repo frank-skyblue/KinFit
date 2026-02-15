@@ -1,6 +1,8 @@
 /**
  * Maps granular muscle groups (from exercises) to parent body part categories
  * for a consistent high-level volume view.
+ *
+ * Must include all values from front-end ALLOWED_MUSCLE_GROUPS.
  */
 export const MUSCLE_GROUP_TO_PARENT: Record<string, string> = {
   chest: 'chest',
@@ -14,11 +16,12 @@ export const MUSCLE_GROUP_TO_PARENT: Record<string, string> = {
   hamstrings: 'legs',
   glutes: 'legs',
   calves: 'legs',
+  adductors: 'legs',
+  abductors: 'legs',
   core: 'core',
   abs: 'core',
   obliques: 'core',
   cardio: 'cardio',
-  'full body': 'mobility',
   mobility: 'mobility',
 };
 

@@ -103,6 +103,29 @@
       ]
     },
     {
+      "name": "Run: Seed Exercises",
+      "type": "node",
+      "request": "launch",
+      "cwd": "${workspaceFolder}/back-end",
+      "runtimeArgs": [
+        "-r",
+        "ts-node/register"
+      ],
+      "args": [
+        "${workspaceFolder}/back-end/src/seedExercises.ts"
+      ],
+      "env": {
+        "TS_NODE_PROJECT": "${workspaceFolder}/back-end/tsconfig.json"
+      },
+      "sourceMaps": true,
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "skipFiles": [
+        "<node_internals>/**",
+        "**/node_modules/**"
+      ]
+    },
+    {
       "name": "Run: Migrate Legacy Set Entries",
       "type": "node",
       "request": "launch",
