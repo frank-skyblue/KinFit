@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ExerciseEntry, SetEntry, getSetEntries, formatSetNotation, isCardioExercise } from '../../services/api';
+import { ExerciseEntry, SetEntry, getSetEntries, buildNotationSummary } from '../../services/api';
 import FormInput from '../common/FormInput';
 import FormSelect from '../common/FormSelect';
 
@@ -40,9 +40,9 @@ const ExerciseCard = ({ exercise, index, units, onUpdate, onRemove, dragHandlePr
   const [isExpanded, setIsExpanded] = useState(false);
   const showExpanded = isExpanded && !forceCollapsed;
 
-  const cardio = isCardioExercise(exercise);
+  const category = exercise.category || 'strength';
   const entries = getSetEntries(exercise);
-  const notationSummary = entries.map((e) => formatSetNotation(e, exercise.category)).join(' · ');
+  const notationSummary = buildNotationSummary(exercise);
 
   const handleUpdateEntry = (entryIndex: number, field: keyof SetEntry, value: string | number) => {
     const newEntries = [...entries];
@@ -151,129 +151,153 @@ const ExerciseCard = ({ exercise, index, units, onUpdate, onRemove, dragHandlePr
       {/* Expanded Content */}
       {showExpanded && (
         <div className="px-3 pb-3 space-y-2 border-t border-kin-stone-100">
-          {/* Set entry rows */}
-          {entries.map((entry, entryIndex) => (
-            <div key={entryIndex} className="flex items-end gap-2">
-              {cardio ? (
-                /* ── Cardio row: Duration + Zone ── */
-                <>
-                  <div className="flex-3 min-w-20">
-                    <FormInput
-                      label={entryIndex === 0 ? 'Duration' : undefined}
-                      size="compact"
-                      type="number"
-                      value={entry.duration || ''}
-                      onChange={(e) => handleUpdateEntry(entryIndex, 'duration', parseFloat(e.target.value) || 0)}
-                      min="0"
-                      step={1}
-                      suffix="min"
-                    />
-                  </div>
-
-                  <div className="flex-2 min-w-16">
-                    <FormSelect
-                      label={entryIndex === 0 ? 'Zone' : undefined}
-                      size="compact"
-                      options={ZONE_OPTIONS}
-                      value={String(entry.intensityZone || 2)}
-                      onChange={(e) => handleUpdateEntry(entryIndex, 'intensityZone', parseInt(e.target.value))}
-                    />
-                  </div>
-                </>
-              ) : (
-                /* ── Strength row: Weight + Type + Reps + Sets ── */
-                <>
-                  <div className="flex-3 min-w-18">
-                    {entry.weightType !== 'bw' ? (
+          {/* "other" category — notes only, no set entry rows */}
+          {category === 'other' ? (
+            <FormInput
+              label="Notes"
+              size="compact"
+              type="text"
+              value={exercise.notes || ''}
+              onChange={(e) => handleNotesChange(e.target.value)}
+              placeholder="Describe the exercise..."
+            />
+          ) : (
+            <>
+              {/* Set entry rows */}
+              {entries.map((entry, entryIndex) => (
+                <div key={entryIndex} className="flex items-end gap-2">
+                  {category === 'cardio' ? (
+                    /* ── Cardio row: Duration + Zone ── */
+                    <>
+                      <div className="flex-3 min-w-20">
+                        <FormInput
+                          label={entryIndex === 0 ? 'Duration' : undefined}
+                          size="compact"
+                          type="number"
+                          value={entry.duration || ''}
+                          onChange={(e) => handleUpdateEntry(entryIndex, 'duration', parseFloat(e.target.value) || 0)}
+                          min="0"
+                          step={1}
+                          suffix="min"
+                        />
+                      </div>
+                      <div className="flex-2 min-w-16">
+                        <FormSelect
+                          label={entryIndex === 0 ? 'Zone' : undefined}
+                          size="compact"
+                          options={ZONE_OPTIONS}
+                          value={String(entry.intensityZone || 2)}
+                          onChange={(e) => handleUpdateEntry(entryIndex, 'intensityZone', parseInt(e.target.value))}
+                        />
+                      </div>
+                    </>
+                  ) : category === 'flexibility' ? (
+                    /* ── Flexibility row: Duration only ── */
+                    <div className="flex-3 min-w-20">
                       <FormInput
-                        label={entryIndex === 0 ? 'Weight' : undefined}
+                        label={entryIndex === 0 ? 'Duration' : undefined}
                         size="compact"
                         type="number"
-                        value={entry.weightValue || ''}
-                        onChange={(e) => handleUpdateEntry(entryIndex, 'weightValue', parseFloat(e.target.value) || 0)}
+                        value={entry.duration || ''}
+                        onChange={(e) => handleUpdateEntry(entryIndex, 'duration', parseFloat(e.target.value) || 0)}
                         min="0"
-                        step={5}
-                        suffix={units}
+                        step={1}
+                        suffix="min"
                       />
-                    ) : (
-                      <>
-                        {entryIndex === 0 && <span className="block text-xs font-inter text-kin-teal mb-1">Weight</span>}
-                        <div className="px-3 py-2 text-sm text-kin-teal font-inter text-center">—</div>
-                      </>
-                    )}
-                  </div>
+                    </div>
+                  ) : (
+                    /* ── Strength row: Weight + Type + Reps + Sets ── */
+                    <>
+                      <div className="flex-3 min-w-18">
+                        {entry.weightType !== 'bw' ? (
+                          <FormInput
+                            label={entryIndex === 0 ? 'Weight' : undefined}
+                            size="compact"
+                            type="number"
+                            value={entry.weightValue || ''}
+                            onChange={(e) => handleUpdateEntry(entryIndex, 'weightValue', parseFloat(e.target.value) || 0)}
+                            min="0"
+                            step={5}
+                            suffix={units}
+                          />
+                        ) : (
+                          <>
+                            {entryIndex === 0 && <span className="block text-xs font-inter text-kin-teal mb-1">Weight</span>}
+                            <div className="px-3 py-2 text-sm text-kin-teal font-inter text-center">—</div>
+                          </>
+                        )}
+                      </div>
+                      <div className="flex-2 min-w-16">
+                        <FormSelect
+                          label={entryIndex === 0 ? 'Type' : undefined}
+                          size="compact"
+                          options={WEIGHT_TYPE_OPTIONS}
+                          value={entry.weightType || 'a'}
+                          onChange={(e) => handleUpdateEntry(entryIndex, 'weightType', e.target.value)}
+                        />
+                      </div>
+                      <div className="flex-2 min-w-14">
+                        <FormInput
+                          label={entryIndex === 0 ? 'Reps' : undefined}
+                          size="compact"
+                          type="number"
+                          value={entry.reps || ''}
+                          onChange={(e) => handleUpdateEntry(entryIndex, 'reps', parseInt(e.target.value) || 0)}
+                          min="1"
+                          step={1}
+                        />
+                      </div>
+                      <div className="flex-2 min-w-14">
+                        <FormSelect
+                          label={entryIndex === 0 ? 'Sets' : undefined}
+                          size="compact"
+                          options={SETS_OPTIONS}
+                          value={String(entry.sets || 1)}
+                          onChange={(e) => handleUpdateEntry(entryIndex, 'sets', parseInt(e.target.value))}
+                        />
+                      </div>
+                    </>
+                  )}
 
-                  <div className="flex-2 min-w-16">
-                    <FormSelect
-                      label={entryIndex === 0 ? 'Type' : undefined}
-                      size="compact"
-                      options={WEIGHT_TYPE_OPTIONS}
-                      value={entry.weightType || 'a'}
-                      onChange={(e) => handleUpdateEntry(entryIndex, 'weightType', e.target.value)}
-                    />
-                  </div>
+                  {entries.length > 1 && (
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveEntry(entryIndex)}
+                      className="shrink-0 p-1.5 text-kin-coral hover:text-kin-coral-600 transition"
+                      aria-label="Remove set line"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clipRule="evenodd" />
+                      </svg>
+                    </button>
+                  )}
+                </div>
+              ))}
 
-                  <div className="flex-2 min-w-14">
-                    <FormInput
-                      label={entryIndex === 0 ? 'Reps' : undefined}
-                      size="compact"
-                      type="number"
-                      value={entry.reps || ''}
-                      onChange={(e) => handleUpdateEntry(entryIndex, 'reps', parseInt(e.target.value) || 0)}
-                      min="1"
-                      step={1}
-                    />
-                  </div>
+              {/* Add line button */}
+              <button
+                type="button"
+                onClick={handleAddEntry}
+                className="text-xs font-inter text-kin-teal hover:text-kin-navy transition flex items-center gap-1"
+                aria-label="Add another set line"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
+                </svg>
+                Add Line
+              </button>
 
-                  <div className="flex-2 min-w-14">
-                    <FormSelect
-                      label={entryIndex === 0 ? 'Sets' : undefined}
-                      size="compact"
-                      options={SETS_OPTIONS}
-                      value={String(entry.sets || 1)}
-                      onChange={(e) => handleUpdateEntry(entryIndex, 'sets', parseInt(e.target.value))}
-                    />
-                  </div>
-                </>
-              )}
-
-              {entries.length > 1 && (
-                <button
-                  type="button"
-                  onClick={() => handleRemoveEntry(entryIndex)}
-                  className="shrink-0 p-1.5 text-kin-coral hover:text-kin-coral-600 transition"
-                  aria-label="Remove set line"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clipRule="evenodd" />
-                  </svg>
-                </button>
-              )}
-            </div>
-          ))}
-
-          {/* Add line button */}
-          <button
-            type="button"
-            onClick={handleAddEntry}
-            className="text-xs font-inter text-kin-teal hover:text-kin-navy transition flex items-center gap-1"
-            aria-label="Add another set line"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor">
-              <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
-            </svg>
-            Add Line
-          </button>
-
-          {/* Notes */}
-          <FormInput
-            label="Notes"
-            size="compact"
-            type="text"
-            value={exercise.notes || ''}
-            onChange={(e) => handleNotesChange(e.target.value)}
-            placeholder="Optional notes..."
-          />
+              {/* Notes */}
+              <FormInput
+                label="Notes"
+                size="compact"
+                type="text"
+                value={exercise.notes || ''}
+                onChange={(e) => handleNotesChange(e.target.value)}
+                placeholder="Optional notes..."
+              />
+            </>
+          )}
         </div>
       )}
     </div>

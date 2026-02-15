@@ -24,7 +24,7 @@ export const getExercises = async (req: AuthRequest, res: Response): Promise<voi
       query.muscleGroups = muscleGroup;
     }
 
-    const exercises = await Exercise.find(query).sort({ name: 1 }).limit(100);
+    const exercises = await Exercise.find(query).sort({ name: 1 }).limit(500);
 
     res.status(200).json({ exercises });
   } catch (error) {
@@ -44,13 +44,11 @@ export const createExercise = async (req: AuthRequest, res: Response): Promise<v
 
     const { name, muscleGroups, description, category } = req.body;
 
-    // Validation
     if (!name) {
       res.status(400).json({ error: 'Exercise name is required' });
       return;
     }
 
-    // Check if exercise already exists for this user
     const existingExercise = await Exercise.findOne({
       name: { $regex: new RegExp(`^${name}$`, 'i') },
       $or: [{ isCustom: false }, { createdByUserId: new mongoose.Types.ObjectId(userId) }],
@@ -61,7 +59,6 @@ export const createExercise = async (req: AuthRequest, res: Response): Promise<v
       return;
     }
 
-    // Create custom exercise
     const exercise = new Exercise({
       name,
       muscleGroups: muscleGroups || [],
@@ -101,3 +98,71 @@ export const getExerciseById = async (req: AuthRequest, res: Response): Promise<
   }
 };
 
+export const updateExercise = async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const userId = req.user?.userId;
+    const { exerciseId } = req.params;
+
+    if (!userId) {
+      res.status(401).json({ error: 'User not authenticated' });
+      return;
+    }
+
+    const exercise = await Exercise.findById(exerciseId);
+
+    if (!exercise) {
+      res.status(404).json({ error: 'Exercise not found' });
+      return;
+    }
+
+    if (!exercise.isCustom || exercise.createdByUserId?.toString() !== userId) {
+      res.status(403).json({ error: 'You can only edit your own custom exercises' });
+      return;
+    }
+
+    const { name, muscleGroups, description, category } = req.body;
+
+    if (name) exercise.name = name;
+    if (muscleGroups !== undefined) exercise.muscleGroups = muscleGroups;
+    if (description !== undefined) exercise.description = description;
+    if (category) exercise.category = category;
+
+    await exercise.save();
+
+    res.status(200).json({ message: 'Exercise updated successfully', exercise });
+  } catch (error) {
+    console.error('Update exercise error:', error);
+    res.status(500).json({ error: 'Failed to update exercise' });
+  }
+};
+
+export const deleteExercise = async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const userId = req.user?.userId;
+    const { exerciseId } = req.params;
+
+    if (!userId) {
+      res.status(401).json({ error: 'User not authenticated' });
+      return;
+    }
+
+    const exercise = await Exercise.findById(exerciseId);
+
+    if (!exercise) {
+      res.status(404).json({ error: 'Exercise not found' });
+      return;
+    }
+
+    if (!exercise.isCustom || exercise.createdByUserId?.toString() !== userId) {
+      res.status(403).json({ error: 'You can only delete your own custom exercises' });
+      return;
+    }
+
+    await exercise.deleteOne();
+
+    res.status(200).json({ message: 'Exercise deleted successfully' });
+  } catch (error) {
+    console.error('Delete exercise error:', error);
+    res.status(500).json({ error: 'Failed to delete exercise' });
+  }
+};

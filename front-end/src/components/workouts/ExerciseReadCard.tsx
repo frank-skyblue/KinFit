@@ -6,6 +6,7 @@ interface ExerciseReadCardProps {
 }
 
 const ExerciseReadCard = ({ exercise, index }: ExerciseReadCardProps) => {
+  const isOther = exercise.category === 'other';
   const entries = getSetEntries(exercise);
 
   return (
@@ -17,13 +18,15 @@ const ExerciseReadCard = ({ exercise, index }: ExerciseReadCardProps) => {
         <span className="text-xs text-kin-teal font-inter">#{index + 1}</span>
       </div>
 
-      <div className="space-y-0.5">
-        {entries.map((entry, i) => (
-          <p key={i} className="text-sm font-inter text-kin-teal font-medium">
-            {formatSetNotation(entry, exercise.category)}
-          </p>
-        ))}
-      </div>
+      {!isOther && entries.length > 0 && (
+        <div className="space-y-0.5">
+          {entries.map((entry, i) => (
+            <p key={i} className="text-sm font-inter text-kin-teal font-medium">
+              {formatSetNotation(entry, exercise.category)}
+            </p>
+          ))}
+        </div>
+      )}
 
       {exercise.notes && (
         <p className="mt-1.5 text-xs text-kin-teal font-inter italic">

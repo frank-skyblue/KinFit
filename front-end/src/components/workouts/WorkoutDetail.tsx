@@ -171,20 +171,23 @@ const WorkoutDetail = () => {
   const handleAddExercise = (exercise: Exercise) => {
     if (!editData) return;
 
-    const isCardio = exercise.category === 'cardio';
-    const defaultEntries = isCardio
-      ? [{ duration: 30, intensityZone: 2 }]
-      : [{ weightValue: 0, weightType: 'a' as const, reps: 10, sets: 3 }];
+    const cat = exercise.category as ExerciseEntry['category'];
+    const defaultEntries =
+      cat === 'cardio'      ? [{ duration: 30, intensityZone: 2 }] :
+      cat === 'flexibility'  ? [{ duration: 30 }] :
+      cat === 'other'        ? [] :
+      /* strength */           [{ weightValue: 0, weightType: 'a' as const, reps: 10, sets: 3 }];
+    const isStrength = !cat || cat === 'strength';
 
     const newExercise: ExerciseEntry = {
       exerciseId: exercise._id,
       exerciseName: exercise.name,
-      category: exercise.category as ExerciseEntry['category'],
-      weightValue: isCardio ? undefined : 0,
-      weightType: isCardio ? undefined : 'a',
-      reps: isCardio ? undefined : 10,
-      sets: isCardio ? undefined : 3,
-      setEntries: defaultEntries,
+      category: cat,
+      weightValue: isStrength ? 0 : undefined,
+      weightType: isStrength ? 'a' : undefined,
+      reps: isStrength ? 10 : undefined,
+      sets: isStrength ? 3 : undefined,
+      setEntries: defaultEntries.length > 0 ? defaultEntries : undefined,
       notes: '',
       orderIndex: editData.exercises.length,
       _dragId: uniqueId(),

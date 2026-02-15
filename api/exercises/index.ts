@@ -34,7 +34,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         query.muscleGroups = muscleGroup;
       }
 
-      const exercises = await Exercise.find(query).sort({ name: 1 }).limit(100);
+      const exercises = await Exercise.find(query).sort({ name: 1 }).limit(500);
 
       return res.status(200).json({ exercises });
     } catch (error) {
@@ -76,6 +76,64 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     } catch (error) {
       console.error('Create exercise error:', error);
       return res.status(500).json({ error: 'Failed to create exercise' });
+    }
+  }
+
+  // PUT - Update exercise
+  if (req.method === 'PUT') {
+    try {
+      const { id } = req.query;
+
+      if (!id || typeof id !== 'string') {
+        return res.status(400).json({ error: 'Exercise ID is required' });
+      }
+
+      const exercise = await Exercise.findById(id);
+      if (!exercise) {
+        return res.status(404).json({ error: 'Exercise not found' });
+      }
+
+      if (!exercise.isCustom || exercise.createdByUserId?.toString() !== user.userId) {
+        return res.status(403).json({ error: 'You can only edit your own custom exercises' });
+      }
+
+      const { name, muscleGroups, description, category } = req.body;
+      if (name) exercise.name = name;
+      if (muscleGroups !== undefined) exercise.muscleGroups = muscleGroups;
+      if (description !== undefined) exercise.description = description;
+      if (category) exercise.category = category;
+
+      await exercise.save();
+      return res.status(200).json({ message: 'Exercise updated successfully', exercise });
+    } catch (error) {
+      console.error('Update exercise error:', error);
+      return res.status(500).json({ error: 'Failed to update exercise' });
+    }
+  }
+
+  // DELETE - Delete exercise
+  if (req.method === 'DELETE') {
+    try {
+      const { id } = req.query;
+
+      if (!id || typeof id !== 'string') {
+        return res.status(400).json({ error: 'Exercise ID is required' });
+      }
+
+      const exercise = await Exercise.findById(id);
+      if (!exercise) {
+        return res.status(404).json({ error: 'Exercise not found' });
+      }
+
+      if (!exercise.isCustom || exercise.createdByUserId?.toString() !== user.userId) {
+        return res.status(403).json({ error: 'You can only delete your own custom exercises' });
+      }
+
+      await exercise.deleteOne();
+      return res.status(200).json({ message: 'Exercise deleted successfully' });
+    } catch (error) {
+      console.error('Delete exercise error:', error);
+      return res.status(500).json({ error: 'Failed to delete exercise' });
     }
   }
 

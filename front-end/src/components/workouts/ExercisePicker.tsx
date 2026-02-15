@@ -1,5 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Exercise } from '../../services/api';
+import SearchInput from '../common/SearchInput';
+import useFuzzySearch from '../../hooks/useFuzzySearch';
 
 interface ExercisePickerProps {
   exercises: Exercise[];
@@ -12,9 +14,11 @@ const ExercisePicker = ({ exercises, isLoading, onSelect, onClose }: ExercisePic
   const [searchTerm, setSearchTerm] = useState('');
   const backdropRef = useRef<HTMLDivElement>(null);
 
-  const filtered = exercises.filter((ex) =>
-    ex.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filtered = useFuzzySearch({
+    items: exercises,
+    keys: ['name', 'muscleGroups'],
+    searchTerm,
+  });
 
   const handleSelect = (exercise: Exercise) => {
     onSelect(exercise);
@@ -91,16 +95,14 @@ const ExercisePicker = ({ exercises, isLoading, onSelect, onClose }: ExercisePic
 
         {/* Search */}
         <div className="p-4 border-b border-kin-stone-200">
-        <input
-          type="text"
-          placeholder="Search exercises..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full px-4 py-2.5 border border-kin-stone-300 rounded-kin-sm focus:ring-2 focus:ring-kin-coral focus:border-transparent outline-none transition font-inter"
-          aria-label="Search exercises"
-          autoFocus
-        />
-      </div>
+          <SearchInput
+            value={searchTerm}
+            onChange={setSearchTerm}
+            placeholder="Search exercises..."
+            ariaLabel="Search exercises"
+            autoFocus
+          />
+        </div>
 
         {/* Exercise List */}
         <div className="flex-1 overflow-y-auto overscroll-contain p-4 space-y-2">

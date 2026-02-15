@@ -133,15 +133,11 @@ export const uniqueId = (): string => {
 /** Resolve set entries from an exercise, falling back to legacy single-line fields */
 export const getSetEntries = (exercise: ExerciseEntry): SetEntry[] => {
   if (exercise.setEntries && exercise.setEntries.length > 0) return exercise.setEntries;
-  if (exercise.category === 'cardio') {
-    return [{ duration: 30, intensityZone: 2 }];
-  }
+  if (exercise.category === 'cardio') return [{ duration: 30, intensityZone: 2 }];
+  if (exercise.category === 'flexibility') return [{ duration: 30 }];
+  if (exercise.category === 'other') return [];
   return [{ weightValue: exercise.weightValue, weightType: exercise.weightType || 'a', reps: exercise.reps || 1, sets: exercise.sets || 1 }];
 };
-
-/** Check if an exercise uses cardio tracking */
-export const isCardioExercise = (exercise: ExerciseEntry): boolean =>
-  exercise.category === 'cardio';
 
 /** Format a single set entry as compact notation */
 export const formatSetNotation = (entry: SetEntry, category?: string): string => {
@@ -149,8 +145,16 @@ export const formatSetNotation = (entry: SetEntry, category?: string): string =>
     const zone = entry.intensityZone ? `Z${entry.intensityZone}` : '';
     return `${entry.duration || 0}min${zone ? ` · ${zone}` : ''}`;
   }
+  if (category === 'flexibility') return `${entry.duration || 0}min`;
   if (entry.weightType === 'bw') return `bw × ${entry.reps} × ${entry.sets}`;
   return `${entry.weightValue || 0}${entry.weightType || 'a'} × ${entry.reps} × ${entry.sets}`;
+};
+
+/** Build a notation summary for an exercise (returns empty string for "other") */
+export const buildNotationSummary = (exercise: ExerciseEntry): string => {
+  if (exercise.category === 'other') return exercise.notes || '';
+  const entries = getSetEntries(exercise);
+  return entries.map((e) => formatSetNotation(e, exercise.category)).join(' · ');
 };
 
 /** Normalize an exercise before saving — sets legacy fields from first setEntry for backward compat */
@@ -160,16 +164,16 @@ export const normalizeExerciseForSave = (exercise: ExerciseEntry): ExerciseEntry
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { _dragId, ...rest } = exercise;
 
-  if (exercise.category === 'cardio') {
-    return { ...rest, setEntries: entries };
+  if (exercise.category === 'cardio' || exercise.category === 'flexibility' || exercise.category === 'other') {
+    return { ...rest, setEntries: entries.length > 0 ? entries : undefined };
   }
 
   return {
     ...rest,
-    weightValue: first.weightValue,
-    weightType: first.weightType,
-    reps: first.reps,
-    sets: first.sets,
+    weightValue: first?.weightValue,
+    weightType: first?.weightType,
+    reps: first?.reps,
+    sets: first?.sets,
     setEntries: entries,
   };
 };
@@ -249,6 +253,16 @@ export const createExercise = async (exercise: { name: string; muscleGroups?: st
 
 export const getExerciseById = async (exerciseId: string) => {
   const response = await api.get(`/exercises/${exerciseId}`);
+  return response.data;
+};
+
+export const updateExercise = async (exerciseId: string, data: { name?: string; muscleGroups?: string[]; description?: string; category?: string }) => {
+  const response = await api.put(`/exercises/${exerciseId}`, data);
+  return response.data;
+};
+
+export const deleteExercise = async (exerciseId: string) => {
+  const response = await api.delete(`/exercises/${exerciseId}`);
   return response.data;
 };
 
