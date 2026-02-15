@@ -58,6 +58,8 @@ export const createExercise = async (req: AuthRequest, res: Response): Promise<v
       secondaryMuscleGroups,
       description,
       category,
+      isCustom: isCustomParam,
+      isBuiltIn: isBuiltInParam,
     } = req.body;
 
     if (!name) {
@@ -76,14 +78,19 @@ export const createExercise = async (req: AuthRequest, res: Response): Promise<v
     const primary = primaryMuscleGroups ?? [];
     const secondary = secondaryMuscleGroups ?? [];
 
+    const userDoc = await User.findById(userId).select('isAdmin').lean();
+    const isAdmin = !!(userDoc as { isAdmin?: boolean } | null)?.isAdmin;
+    const wantsBuiltIn = isCustomParam === false || isBuiltInParam === true;
+    const isCustom = isAdmin && wantsBuiltIn ? false : true;
+
     const exercise = new Exercise({
       name,
       primaryMuscleGroups: primary,
       secondaryMuscleGroups: secondary,
       description,
       category: category || 'strength',
-      isCustom: true,
-      createdByUserId: new mongoose.Types.ObjectId(userId),
+      isCustom,
+      ...(isCustom && { createdByUserId: new mongoose.Types.ObjectId(userId) }),
     });
 
     await exercise.save();

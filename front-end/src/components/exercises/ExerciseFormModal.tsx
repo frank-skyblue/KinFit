@@ -16,18 +16,22 @@ import ErrorAlert from "../common/ErrorAlert";
 
 interface ExerciseFormModalProps {
   exercise?: Exercise | null;
+  isAdmin?: boolean;
   onSave: (data: {
     name: string;
     primaryMuscleGroups: MuscleGroup[];
     secondaryMuscleGroups: MuscleGroup[];
     category: ExerciseCategory;
     description: string;
+    isCustom?: boolean;
+    isBuiltIn?: boolean;
   }) => Promise<void>;
   onClose: () => void;
 }
 
 const ExerciseFormModal = ({
   exercise,
+  isAdmin,
   onSave,
   onClose,
 }: ExerciseFormModalProps) => {
@@ -69,6 +73,7 @@ const ExerciseFormModal = ({
   );
   const [primaryExpanded, setPrimaryExpanded] = useState(false);
   const [secondaryExpanded, setSecondaryExpanded] = useState(false);
+  const [isBuiltIn, setIsBuiltIn] = useState(false);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -134,13 +139,26 @@ const ExerciseFormModal = ({
     setError("");
     setIsSaving(true);
     try {
-      await onSave({
+      const payload: {
+        name: string;
+        primaryMuscleGroups: MuscleGroup[];
+        secondaryMuscleGroups: MuscleGroup[];
+        category: ExerciseCategory;
+        description: string;
+        isCustom?: boolean;
+        isBuiltIn?: boolean;
+      } = {
         name,
         primaryMuscleGroups: [...primaryMuscleGroups].sort(),
         secondaryMuscleGroups: [...secondaryMuscleGroups].sort(),
         category,
         description,
-      });
+      };
+      if (!isEdit && isAdmin) {
+        payload.isCustom = !isBuiltIn;
+        if (isBuiltIn) payload.isBuiltIn = true;
+      }
+      await onSave(payload);
     } catch (err: unknown) {
       setError(getApiErrorMessage(err) || "Something went wrong");
       setIsSaving(false);
@@ -219,6 +237,21 @@ const ExerciseFormModal = ({
               ))}
             </select>
           </div>
+
+          {!isEdit && isAdmin && (
+            <div className="flex items-center gap-3">
+              <label className="flex items-center gap-2 cursor-pointer font-inter text-sm text-kin-navy">
+                <input
+                  type="checkbox"
+                  checked={isBuiltIn}
+                  onChange={(e) => setIsBuiltIn(e.target.checked)}
+                  className="rounded border-kin-stone-400 text-kin-coral focus:ring-kin-coral"
+                  aria-label="Save as built-in exercise"
+                />
+                <span>Save as built-in exercise (visible to all users)</span>
+              </label>
+            </div>
+          )}
 
           <div>
             <label className="block text-sm font-medium font-inter text-kin-navy mb-1.5">

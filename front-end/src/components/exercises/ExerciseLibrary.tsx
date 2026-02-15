@@ -40,15 +40,15 @@ const ExerciseLibrary = () => {
   const [deletingExercise, setDeletingExercise] = useState<Exercise | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
-  const fetchExercises = async () => {
-    setIsLoading(true);
+  const fetchExercises = async (showLoading = true) => {
+    if (showLoading) setIsLoading(true);
     try {
       const response = await getExercises();
       setExercises(response.exercises);
     } catch (err) {
       console.error('Failed to fetch exercises:', err);
     } finally {
-      setIsLoading(false);
+      if (showLoading) setIsLoading(false);
     }
   };
 
@@ -93,6 +93,8 @@ const ExerciseLibrary = () => {
     secondaryMuscleGroups: MuscleGroup[];
     category: ExerciseCategory;
     description: string;
+    isCustom?: boolean;
+    isBuiltIn?: boolean;
   }) => {
     if (editingExercise) {
       await updateExercise(editingExercise._id, data);
@@ -102,7 +104,7 @@ const ExerciseLibrary = () => {
       showSuccess('Exercise created!');
     }
     handleCloseForm();
-    fetchExercises();
+    fetchExercises(false);
   };
 
   const handleDelete = async () => {
@@ -112,7 +114,7 @@ const ExerciseLibrary = () => {
       await deleteExercise(deletingExercise._id);
       setDeletingExercise(null);
       showSuccess('Exercise deleted.');
-      fetchExercises();
+      fetchExercises(false);
     } catch (err) {
       console.error('Failed to delete exercise:', err);
     } finally {
@@ -152,6 +154,7 @@ const ExerciseLibrary = () => {
         {showFormModal && (
           <ExerciseFormModal
             exercise={editingExercise}
+            isAdmin={user?.isAdmin}
             onSave={handleSave}
             onClose={handleCloseForm}
           />

@@ -298,6 +298,8 @@ export const createExercise = (exercise: {
   secondaryMuscleGroups?: MuscleGroup[];
   description?: string;
   category: ExerciseCategory;
+  isCustom?: boolean;
+  isBuiltIn?: boolean;
 }) => request.post('/exercises', exercise);
 
 export const getExerciseById = (exerciseId: string) => request.get(`/exercises/${exerciseId}`);

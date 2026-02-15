@@ -63,6 +63,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         secondaryMuscleGroups,
         description,
         category,
+        isCustom: isCustomParam,
+        isBuiltIn: isBuiltInParam,
       } = req.body;
 
       if (!name) {
@@ -81,14 +83,19 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const primary = primaryMuscleGroups ?? [];
       const secondary = secondaryMuscleGroups ?? [];
 
+      const userDoc = await User.findById(user.userId).select('isAdmin').lean();
+      const isAdmin = !!(userDoc as { isAdmin?: boolean } | null)?.isAdmin;
+      const wantsBuiltIn = isCustomParam === false || isBuiltInParam === true;
+      const isCustom = isAdmin && wantsBuiltIn ? false : true;
+
       const exercise = new Exercise({
         name,
         primaryMuscleGroups: primary,
         secondaryMuscleGroups: secondary,
         description,
         category: category || 'strength',
-        isCustom: true,
-        createdByUserId: new mongoose.Types.ObjectId(user.userId),
+        isCustom,
+        ...(isCustom && { createdByUserId: new mongoose.Types.ObjectId(user.userId) }),
       });
 
       await exercise.save();
