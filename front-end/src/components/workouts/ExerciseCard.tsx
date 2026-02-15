@@ -201,7 +201,7 @@ const ExerciseCard = ({ exercise, index, units, onUpdate, onRemove, dragHandlePr
                         value={entry.duration || ''}
                         onChange={(e) => handleUpdateEntry(entryIndex, 'duration', parseFloat(e.target.value) || 0)}
                         min="0"
-                        step={1}
+                        step={5}
                         suffix="min"
                       />
                     </div>
