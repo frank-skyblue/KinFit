@@ -44,40 +44,40 @@ const WorkoutSummary = ({ workout, units, isEditing, editData, onEditDataChange 
             {visibilityIcon} {visibilityLabel}
           </span>
         )}
-      </div>
+    </div>
 
-      {/* Notes */}
-      {isEditing && editData ? (
-        <FormTextarea
-          label="Notes"
-          id="edit-notes"
-          value={editData.notes || ''}
-          onChange={(e) => onEditDataChange({ ...editData, notes: e.target.value })}
+    {/* Notes */}
+    {isEditing && editData ? (
+      <FormTextarea
+        label="Notes"
+        id="edit-notes"
+        value={editData.notes || ''}
+        onChange={(e) => onEditDataChange({ ...editData, notes: e.target.value })}
           rows={2}
-          placeholder="Session notes..."
-        />
-      ) : workout.notes ? (
+        placeholder="Session notes..."
+      />
+    ) : workout.notes ? (
         <div className="p-3 bg-kin-stone-50 rounded-kin-sm">
           <p className="text-xs font-semibold text-kin-teal font-inter mb-0.5">Notes</p>
           <p className="text-sm text-kin-navy font-inter">{workout.notes}</p>
-        </div>
-      ) : null}
+      </div>
+    ) : null}
 
-      {/* Tags */}
-      {workout.tags && workout.tags.length > 0 && (
+    {/* Tags */}
+    {workout.tags && workout.tags.length > 0 && (
         <div className="flex flex-wrap gap-1.5">
-          {workout.tags.map((tag, index) => (
-            <span
-              key={index}
+        {workout.tags.map((tag, index) => (
+          <span
+            key={index}
               className="px-2 py-0.5 bg-kin-coral-100 text-kin-coral-700 rounded-full text-xs font-inter"
-            >
-              {tag}
-            </span>
-          ))}
-        </div>
-      )}
-    </div>
-  );
+          >
+            {tag}
+          </span>
+        ))}
+      </div>
+    )}
+  </div>
+);
 };
 
 /** Inline stat: bold value with a small label underneath */

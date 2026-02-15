@@ -3,12 +3,19 @@ import { ExerciseEntry, SetEntry, getSetEntries, formatSetNotation } from '../..
 import FormInput from '../common/FormInput';
 import FormSelect from '../common/FormSelect';
 
+interface DragHandleProps {
+  ref: (node: HTMLElement | null) => void;
+  [key: string]: unknown;
+}
+
 interface ExerciseCardProps {
   exercise: ExerciseEntry;
   index: number;
   units: string;
   onUpdate: (index: number, updatedExercise: ExerciseEntry) => void;
   onRemove: (index: number) => void;
+  dragHandleProps?: DragHandleProps;
+  forceCollapsed?: boolean;
 }
 
 const WEIGHT_TYPE_OPTIONS = [
@@ -22,8 +29,9 @@ const SETS_OPTIONS = Array.from({ length: 10 }, (_, i) => ({
   label: String(i + 1),
 }));
 
-const ExerciseCard = ({ exercise, index, units, onUpdate, onRemove }: ExerciseCardProps) => {
+const ExerciseCard = ({ exercise, index, units, onUpdate, onRemove, dragHandleProps, forceCollapsed }: ExerciseCardProps) => {
   const [isExpanded, setIsExpanded] = useState(false);
+  const showExpanded = isExpanded && !forceCollapsed;
 
   const entries = getSetEntries(exercise);
   const notationSummary = entries.map(formatSetNotation).join(' · ');
@@ -68,19 +76,42 @@ const ExerciseCard = ({ exercise, index, units, onUpdate, onRemove }: ExerciseCa
     <div className="border border-kin-stone-200 rounded-kin-sm overflow-hidden">
       {/* Collapsible Header */}
       <div
-        role="button"
-        tabIndex={0}
-        onClick={handleToggle}
-        onKeyDown={handleKeyDown}
-        className="w-full flex items-center justify-between gap-2 p-3 cursor-pointer hover:bg-kin-stone-50 transition select-none"
-        aria-expanded={isExpanded}
-        aria-label={`${exercise.exerciseName} — ${notationSummary}`}
+        className="w-full flex items-center gap-1 p-3 select-none"
       >
-        <div className="min-w-0 flex-1">
+        {/* Drag Handle */}
+        {dragHandleProps && (
+          <div
+            ref={dragHandleProps.ref}
+            {...Object.fromEntries(
+              Object.entries(dragHandleProps).filter(([k]) => k !== 'ref')
+            )}
+            className="shrink-0 cursor-grab active:cursor-grabbing touch-none p-1 -ml-1 text-kin-stone-400 hover:text-kin-navy transition"
+            aria-label="Drag to reorder"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 16 16" fill="currentColor">
+              <circle cx="5" cy="3" r="1.2" />
+              <circle cx="11" cy="3" r="1.2" />
+              <circle cx="5" cy="8" r="1.2" />
+              <circle cx="11" cy="8" r="1.2" />
+              <circle cx="5" cy="13" r="1.2" />
+              <circle cx="11" cy="13" r="1.2" />
+            </svg>
+          </div>
+        )}
+
+        <div
+          role="button"
+          tabIndex={0}
+          onClick={handleToggle}
+          onKeyDown={handleKeyDown}
+          className="min-w-0 flex-1 cursor-pointer"
+          aria-expanded={showExpanded}
+          aria-label={`${exercise.exerciseName} — ${notationSummary}`}
+        >
           <h3 className="font-semibold font-montserrat text-kin-navy text-sm truncate">
             {exercise.exerciseName}
           </h3>
-          {!isExpanded && (
+          {!showExpanded && (
             <p className="text-xs text-kin-teal font-inter mt-0.5 truncate">{notationSummary}</p>
           )}
         </div>
@@ -99,7 +130,7 @@ const ExerciseCard = ({ exercise, index, units, onUpdate, onRemove }: ExerciseCa
           </button>
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            className={`h-4 w-4 text-kin-teal transition-transform ${isExpanded ? 'rotate-180' : ''}`}
+            className={`h-4 w-4 text-kin-teal transition-transform ${showExpanded ? 'rotate-180' : ''}`}
             viewBox="0 0 20 20"
             fill="currentColor"
             aria-hidden="true"
@@ -110,7 +141,7 @@ const ExerciseCard = ({ exercise, index, units, onUpdate, onRemove }: ExerciseCa
       </div>
 
       {/* Expanded Content */}
-      {isExpanded && (
+      {showExpanded && (
         <div className="px-3 pb-3 space-y-2 border-t border-kin-stone-100">
           {/* Set entry rows */}
           {entries.map((entry, entryIndex) => (

@@ -190,7 +190,7 @@ const Layout = ({ children }: LayoutProps) => {
       </nav>
 
       {/* Mobile Menu Overlay */}
-      {isMobileMenuOpen && (
+          {isMobileMenuOpen && (
         <div
           ref={backdropRef}
           className="md:hidden fixed inset-0 top-16 z-40 bg-black/30 backdrop-blur-sm overscroll-none"
@@ -200,43 +200,43 @@ const Layout = ({ children }: LayoutProps) => {
           aria-label="Navigation menu"
         >
           <div className="bg-white shadow-kin-strong border-b border-kin-stone-200 px-4 py-3 space-y-1">
-            {navItems.map((item) => (
-              <Link
-                key={item.path}
-                to={item.path}
+              {navItems.map((item) => (
+                <Link
+                  key={item.path}
+                  to={item.path}
                 className={`block px-4 py-3 rounded-kin-sm font-semibold font-montserrat text-sm transition ${
-                  isActive(item.path)
+                    isActive(item.path)
                     ? 'bg-kin-coral text-white shadow-kin-soft'
-                    : 'text-kin-navy hover:bg-kin-stone-50'
-                }`}
+                      : 'text-kin-navy hover:bg-kin-stone-50'
+                  }`}
                 onClick={handleNavClose}
-              >
-                <span className="mr-2">{item.icon}</span>
-                {item.label}
-              </Link>
-            ))}
+                >
+                  <span className="mr-2">{item.icon}</span>
+                  {item.label}
+                </Link>
+              ))}
             <hr className="border-kin-stone-200" />
-            <Link
-              to="/profile"
+              <Link
+                to="/profile"
               className="block px-4 py-3 rounded-kin-sm text-kin-navy hover:bg-kin-stone-50 font-inter transition"
               onClick={handleNavClose}
-            >
-              Profile
-            </Link>
-            <Link
-              to="/settings"
+              >
+                Profile
+              </Link>
+              <Link
+                to="/settings"
               className="block px-4 py-3 rounded-kin-sm text-kin-navy hover:bg-kin-stone-50 font-inter transition"
               onClick={handleNavClose}
-            >
-              Settings
-            </Link>
-            <button
-              onClick={handleLogout}
+              >
+                Settings
+              </Link>
+              <button
+                onClick={handleLogout}
               className="w-full text-left px-4 py-3 rounded-kin-sm text-kin-coral hover:bg-kin-coral-50 font-inter transition"
-            >
-              Logout
-            </button>
-          </div>
+              >
+                Logout
+              </button>
+            </div>
         </div>
       )}
 

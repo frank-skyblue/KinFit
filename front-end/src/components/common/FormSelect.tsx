@@ -30,9 +30,9 @@ const FormSelect = ({ label, options, size = 'default', id, className, ...rest }
   return (
     <div className={className}>
       {label && (
-        <label htmlFor={id} className={styles.label}>
-          {label}
-        </label>
+      <label htmlFor={id} className={styles.label}>
+        {label}
+      </label>
       )}
       <select id={id} className={styles.select} {...rest}>
         {options.map((opt) => (

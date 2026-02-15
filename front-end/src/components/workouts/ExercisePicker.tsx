@@ -91,42 +91,42 @@ const ExercisePicker = ({ exercises, isLoading, onSelect, onClose }: ExercisePic
 
         {/* Search */}
         <div className="p-4 border-b border-kin-stone-200">
-          <input
-            type="text"
-            placeholder="Search exercises..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+        <input
+          type="text"
+          placeholder="Search exercises..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full px-4 py-2.5 border border-kin-stone-300 rounded-kin-sm focus:ring-2 focus:ring-kin-coral focus:border-transparent outline-none transition font-inter"
-            aria-label="Search exercises"
-            autoFocus
-          />
-        </div>
+          aria-label="Search exercises"
+          autoFocus
+        />
+      </div>
 
         {/* Exercise List */}
         <div className="flex-1 overflow-y-auto overscroll-contain p-4 space-y-2">
-          {isLoading ? (
+        {isLoading ? (
             <div className="text-center py-8 text-kin-teal font-inter">Loading exercises...</div>
-          ) : filtered.length === 0 ? (
+        ) : filtered.length === 0 ? (
             <div className="text-center py-8 text-kin-teal font-inter">
-              {exercises.length === 0
-                ? 'No exercises found. Run the seed script to populate exercises.'
-                : 'No exercises match your search.'}
-            </div>
-          ) : (
-            filtered.map((exercise) => (
-              <button
-                key={exercise._id}
-                type="button"
-                onClick={() => handleSelect(exercise)}
-                className="w-full text-left px-4 py-3 bg-white border border-kin-stone-200 rounded-kin-sm hover:border-kin-coral hover:bg-kin-coral-50 transition"
-                tabIndex={0}
-                aria-label={`Add ${exercise.name} to workout`}
-              >
-                <p className="font-semibold font-inter text-kin-navy">{exercise.name}</p>
-                <p className="text-sm text-kin-teal font-inter">{exercise.muscleGroups.join(', ')}</p>
-              </button>
-            ))
-          )}
+            {exercises.length === 0
+              ? 'No exercises found. Run the seed script to populate exercises.'
+              : 'No exercises match your search.'}
+          </div>
+        ) : (
+          filtered.map((exercise) => (
+            <button
+              key={exercise._id}
+              type="button"
+              onClick={() => handleSelect(exercise)}
+              className="w-full text-left px-4 py-3 bg-white border border-kin-stone-200 rounded-kin-sm hover:border-kin-coral hover:bg-kin-coral-50 transition"
+              tabIndex={0}
+              aria-label={`Add ${exercise.name} to workout`}
+            >
+              <p className="font-semibold font-inter text-kin-navy">{exercise.name}</p>
+              <p className="text-sm text-kin-teal font-inter">{exercise.muscleGroups.join(', ')}</p>
+            </button>
+          ))
+        )}
         </div>
       </div>
     </div>

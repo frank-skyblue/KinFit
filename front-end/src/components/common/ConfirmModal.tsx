@@ -70,29 +70,29 @@ const ConfirmModal = ({
       aria-label={title}
     >
       <div className="bg-white rounded-kin-lg shadow-kin-strong p-6 max-w-md w-full">
-        <h3 className="text-xl font-bold font-montserrat text-kin-navy mb-4">{title}</h3>
-        <p className="text-kin-teal font-inter mb-6">{message}</p>
-        <div className="flex gap-3">
-          <button
-            type="button"
-            onClick={onCancel}
-            disabled={isLoading}
-            className="flex-1 bg-kin-stone-200 text-kin-navy rounded-kin-sm font-semibold font-montserrat py-2 px-4 hover:bg-kin-stone-300 transition disabled:opacity-50"
-          >
-            {cancelLabel}
-          </button>
-          <button
-            type="button"
-            onClick={onConfirm}
-            disabled={isLoading}
-            className="flex-1 bg-kin-coral text-white rounded-kin-sm font-semibold font-montserrat py-2 px-4 hover:bg-kin-coral-600 transition disabled:opacity-50"
-          >
-            {isLoading ? 'Please wait...' : confirmLabel}
-          </button>
-        </div>
+      <h3 className="text-xl font-bold font-montserrat text-kin-navy mb-4">{title}</h3>
+      <p className="text-kin-teal font-inter mb-6">{message}</p>
+      <div className="flex gap-3">
+        <button
+          type="button"
+          onClick={onCancel}
+          disabled={isLoading}
+          className="flex-1 bg-kin-stone-200 text-kin-navy rounded-kin-sm font-semibold font-montserrat py-2 px-4 hover:bg-kin-stone-300 transition disabled:opacity-50"
+        >
+          {cancelLabel}
+        </button>
+        <button
+          type="button"
+          onClick={onConfirm}
+          disabled={isLoading}
+          className="flex-1 bg-kin-coral text-white rounded-kin-sm font-semibold font-montserrat py-2 px-4 hover:bg-kin-coral-600 transition disabled:opacity-50"
+        >
+          {isLoading ? 'Please wait...' : confirmLabel}
+        </button>
       </div>
     </div>
-  );
+  </div>
+);
 };
 
 export default ConfirmModal;

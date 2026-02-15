@@ -35,46 +35,46 @@ const WorkoutDetailHeader = ({
   onDelete,
 }: WorkoutDetailHeaderProps) => (
   <div className="mb-6">
-    <Link
-      to="/workouts"
-      className="text-kin-teal hover:text-kin-coral font-inter text-sm mb-2 inline-flex items-center gap-1 transition"
-    >
-      ← Back to Workouts
-    </Link>
+      <Link
+        to="/workouts"
+        className="text-kin-teal hover:text-kin-coral font-inter text-sm mb-2 inline-flex items-center gap-1 transition"
+      >
+        ← Back to Workouts
+      </Link>
 
     <div className="flex items-start justify-between gap-3">
       {/* Title & Date */}
       <div className="min-w-0 flex-1">
-        {isEditing && editData ? (
-          <>
-            <input
-              type="text"
-              value={editData.title ?? 'Workout Session'}
-              onChange={(e) => onEditDataChange({ ...editData, title: e.target.value })}
-              placeholder="Workout title (optional)"
+      {isEditing && editData ? (
+        <>
+          <input
+            type="text"
+            value={editData.title ?? 'Workout Session'}
+            onChange={(e) => onEditDataChange({ ...editData, title: e.target.value })}
+            placeholder="Workout title (optional)"
               className="block w-full text-2xl sm:text-3xl font-bold font-montserrat text-kin-navy mb-2 px-2 py-1 border border-kin-stone-300 rounded-kin-sm focus:ring-2 focus:ring-kin-coral outline-none"
-            />
-            <input
-              type="date"
-              value={editData.date.split('T')[0]}
-              onChange={(e) => onEditDataChange({ ...editData, date: e.target.value })}
-              className="px-2 py-1 border border-kin-stone-300 rounded-kin-sm focus:ring-2 focus:ring-kin-coral outline-none font-inter text-kin-teal"
-            />
-          </>
-        ) : (
-          <>
+          />
+          <input
+            type="date"
+            value={editData.date.split('T')[0]}
+            onChange={(e) => onEditDataChange({ ...editData, date: e.target.value })}
+            className="px-2 py-1 border border-kin-stone-300 rounded-kin-sm focus:ring-2 focus:ring-kin-coral outline-none font-inter text-kin-teal"
+          />
+        </>
+      ) : (
+        <>
             <h1 className="text-2xl sm:text-3xl font-bold font-montserrat text-kin-navy mb-1">
-              {workout.title || 'Workout Session'}
-            </h1>
+            {workout.title || 'Workout Session'}
+          </h1>
             <p className="text-sm sm:text-base text-kin-teal font-inter">{formatDate(workout.date)}</p>
-          </>
-        )}
-      </div>
+        </>
+      )}
+    </div>
 
       {/* Action Buttons */}
       <div className="flex gap-2 shrink-0 pt-1">
-        {isEditing ? (
-          <>
+      {isEditing ? (
+        <>
             {/* Mobile: icon buttons */}
             <button
               type="button"
@@ -103,25 +103,25 @@ const WorkoutDetailHeader = ({
               )}
             </button>
             {/* Desktop: text buttons */}
-            <button
-              type="button"
-              onClick={onCancelEdit}
-              disabled={isSaving}
+          <button
+            type="button"
+            onClick={onCancelEdit}
+            disabled={isSaving}
               className="hidden sm:block bg-kin-stone-200 text-kin-navy rounded-kin-sm font-semibold font-montserrat py-2 px-4 hover:bg-kin-stone-300 transition disabled:opacity-50"
-            >
-              Cancel
-            </button>
-            <button
-              type="button"
-              onClick={onSaveEdit}
-              disabled={isSaving}
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            onClick={onSaveEdit}
+            disabled={isSaving}
               className="hidden sm:block bg-kin-coral text-white rounded-kin-sm font-semibold font-montserrat py-2 px-4 hover:bg-kin-coral-600 transition disabled:opacity-50"
-            >
-              {isSaving ? 'Saving...' : 'Save'}
-            </button>
-          </>
-        ) : (
-          <>
+          >
+            {isSaving ? 'Saving...' : 'Save'}
+          </button>
+        </>
+      ) : (
+        <>
             {/* Mobile: icon buttons */}
             <button
               type="button"
@@ -146,24 +146,24 @@ const WorkoutDetailHeader = ({
               </svg>
             </button>
             {/* Desktop: text buttons */}
-            <button
-              type="button"
-              onClick={onStartEdit}
+          <button
+            type="button"
+            onClick={onStartEdit}
               className="hidden sm:block bg-kin-teal text-white rounded-kin-sm font-semibold font-montserrat py-2 px-4 hover:bg-kin-teal-600 transition"
-              aria-label="Edit workout"
-            >
-              Edit
-            </button>
-            <button
-              type="button"
-              onClick={onDelete}
+            aria-label="Edit workout"
+          >
+            Edit
+          </button>
+          <button
+            type="button"
+            onClick={onDelete}
               className="hidden sm:block bg-white text-kin-coral border border-kin-coral rounded-kin-sm font-semibold font-montserrat py-2 px-4 hover:bg-kin-coral-50 transition"
-              aria-label="Delete workout"
-            >
-              Delete
-            </button>
-          </>
-        )}
+            aria-label="Delete workout"
+          >
+            Delete
+          </button>
+        </>
+      )}
       </div>
     </div>
   </div>

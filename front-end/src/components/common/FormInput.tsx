@@ -107,9 +107,9 @@ const FormInput = ({ label, size = 'default', id, className, type, min, max, ste
   return (
     <div className={className}>
       {label && (
-        <label htmlFor={id} className={styles.label}>
-          {label}
-        </label>
+      <label htmlFor={id} className={styles.label}>
+        {label}
+      </label>
       )}
       <div className="relative">
         <input

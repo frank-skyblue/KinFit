@@ -114,7 +114,16 @@ export interface ExerciseEntry {
   setEntries?: SetEntry[];
   notes?: string;
   orderIndex: number;
+  /** Client-only stable ID for drag-and-drop — stripped before saving */
+  _dragId?: string;
 }
+
+/** Generate a unique ID — uses crypto.randomUUID() in secure contexts, falls back for plain HTTP */
+let _uid = 0;
+export const uniqueId = (): string => {
+  try { return crypto.randomUUID(); }
+  catch { return `_drag_${Date.now()}_${++_uid}`; }
+};
 
 /** Resolve set entries from an exercise, falling back to legacy single-line fields */
 export const getSetEntries = (exercise: ExerciseEntry): SetEntry[] => {
@@ -132,8 +141,10 @@ export const formatSetNotation = (entry: SetEntry): string => {
 export const normalizeExerciseForSave = (exercise: ExerciseEntry): ExerciseEntry => {
   const entries = getSetEntries(exercise);
   const first = entries[0];
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { _dragId, ...rest } = exercise;
   return {
-    ...exercise,
+    ...rest,
     weightValue: first.weightValue,
     weightType: first.weightType,
     reps: first.reps,

@@ -1,17 +1,30 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import {
+  DndContext,
+  closestCenter,
+  PointerSensor,
+  TouchSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from '@dnd-kit/core';
+import {
+  SortableContext,
+  verticalListSortingStrategy,
+  arrayMove,
+} from '@dnd-kit/sortable';
 import Layout from '../dashboard/Layout';
 import FormInput from '../common/FormInput';
 import FormTextarea from '../common/FormTextarea';
 import FormRadioGroup from '../common/FormRadioGroup';
 import ExercisePicker from './ExercisePicker';
-import ExerciseCard from './ExerciseCard';
-import { Exercise, ExerciseEntry, createWorkout, getExercises, normalizeExerciseForSave } from '../../services/api';
+import SortableExerciseCard from './SortableExerciseCard';
+import { Exercise, ExerciseEntry, createWorkout, getExercises, normalizeExerciseForSave, uniqueId } from '../../services/api';
 import { useAuth } from '../../contexts/AuthContext';
 
 const getErrorMessage = (err: unknown): string | undefined =>
   (err as { response?: { data?: { error?: string } } }).response?.data?.error;
-
 const VISIBILITY_OPTIONS = [
   { value: 'private', label: 'Private' },
   { value: 'shared', label: 'Shared with Partners' },
@@ -25,6 +38,12 @@ const NewWorkout = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingExercises, setIsLoadingExercises] = useState(true);
   const [error, setError] = useState('');
+  const [isDragActive, setIsDragActive] = useState(false);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 200, tolerance: 6 } }),
+  );
 
   const [workoutData, setWorkoutData] = useState({
     date: new Date().toISOString().split('T')[0],
@@ -61,6 +80,7 @@ const NewWorkout = () => {
       setEntries: [{ weightValue: 0, weightType: 'a', reps: 10, sets: 3 }],
       notes: '',
       orderIndex: workoutData.exercises.length,
+      _dragId: uniqueId(),
     };
     setWorkoutData({
       ...workoutData,
@@ -78,6 +98,23 @@ const NewWorkout = () => {
   const handleRemoveExercise = (index: number) => {
     const updatedExercises = workoutData.exercises.filter((_, i) => i !== index);
     setWorkoutData({ ...workoutData, exercises: updatedExercises });
+  };
+
+  const handleDragStart = () => setIsDragActive(true);
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    setIsDragActive(false);
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+
+    const oldIndex = workoutData.exercises.findIndex((ex) => ex._dragId === active.id);
+    const newIndex = workoutData.exercises.findIndex((ex) => ex._dragId === over.id);
+    if (oldIndex === -1 || newIndex === -1) return;
+
+    const reordered = arrayMove(workoutData.exercises, oldIndex, newIndex).map(
+      (ex, i) => ({ ...ex, orderIndex: i }),
+    );
+    setWorkoutData({ ...workoutData, exercises: reordered });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -188,21 +225,35 @@ const NewWorkout = () => {
 
             {workoutData.exercises.length === 0 ? (
               <div className="text-center py-8 text-kin-teal font-inter">
-                No exercises added yet. Click "Add Exercise" to get started!
+                No exercises added yet. Click &quot;Add Exercise&quot; to get started!
               </div>
             ) : (
-              <div className="space-y-4">
-                {workoutData.exercises.map((exercise, index) => (
-                  <ExerciseCard
-                    key={index}
-                    exercise={exercise}
-                    index={index}
-                    units={user?.units || 'lbs'}
-                    onUpdate={handleUpdateExercise}
-                    onRemove={handleRemoveExercise}
-                  />
-                ))}
-              </div>
+              <DndContext
+                sensors={sensors}
+                collisionDetection={closestCenter}
+                onDragStart={handleDragStart}
+                onDragEnd={handleDragEnd}
+              >
+                <SortableContext
+                  items={workoutData.exercises.map((ex) => ex._dragId!)}
+                  strategy={verticalListSortingStrategy}
+                >
+                  <div className="space-y-4">
+                    {workoutData.exercises.map((exercise, index) => (
+                      <SortableExerciseCard
+                        key={exercise._dragId!}
+                        id={exercise._dragId!}
+                        exercise={exercise}
+                        index={index}
+                        units={user?.units || 'lbs'}
+                        onUpdate={handleUpdateExercise}
+                        onRemove={handleRemoveExercise}
+                        forceCollapsed={isDragActive}
+                      />
+                    ))}
+                  </div>
+                </SortableContext>
+              </DndContext>
             )}
           </div>
 
