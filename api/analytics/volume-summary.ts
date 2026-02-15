@@ -92,10 +92,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
       for (const entry of (workout as any).exercises) {
         const groups = muscleGroupMap.get(entry.exerciseId.toString()) || [];
+        // Dedupe by parent: legs + quadriceps both map to legs, count sets once per parent
+        const uniqueParents = [
+          ...new Set(
+            groups.map((g: string) => getParentBodyPart(g)).filter(Boolean)
+          ),
+        ];
 
-        for (const granularGroup of groups) {
-          const parent = getParentBodyPart(granularGroup);
-          if (!parent) continue;
+        for (const parent of uniqueParents) {
           const current = bodyPartMap.get(parent) || {
             sets: 0,
             minutes: 0,
