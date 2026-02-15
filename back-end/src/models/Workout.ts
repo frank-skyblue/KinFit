@@ -172,11 +172,10 @@ workoutSchema.pre('save', function (next) {
     this.totalVolume = this.exercises.reduce((total, exercise) => {
       // Skip cardio exercises — they don't contribute to volume
       if (exercise.category === 'cardio') return total;
-      // Use setEntries if available, otherwise fall back to legacy fields
       if (exercise.setEntries && exercise.setEntries.length > 0) {
         return total + exercise.setEntries.reduce((sub, entry) => sub + calcEntryVolume(entry), 0);
       }
-      return total + calcEntryVolume(exercise);
+      return total;
     }, 0);
   }
   next();

@@ -5,6 +5,7 @@ import connectDB from '../_lib/db';
 import { authenticate } from '../_lib/auth';
 import { sendError } from '../_lib/errorResponse';
 import Exercise from '../_lib/models/Exercise';
+import User from '../_lib/models/User';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (cors(req, res)) return;
@@ -32,7 +33,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       }
 
       if (muscleGroup) {
-        query.muscleGroups = muscleGroup;
+        query.$and = [
+          { $or: query.$or },
+          {
+            $or: [
+              { primaryMuscleGroups: muscleGroup },
+              { secondaryMuscleGroups: muscleGroup },
+            ],
+          },
+        ];
+        delete query.$or;
       }
 
       const exercises = await Exercise.find(query).sort({ name: 1 }).limit(500);
@@ -47,7 +57,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   // POST - Create exercise
   if (req.method === 'POST') {
     try {
-      const { name, muscleGroups, description, category } = req.body;
+      const {
+        name,
+        primaryMuscleGroups,
+        secondaryMuscleGroups,
+        description,
+        category,
+      } = req.body;
 
       if (!name) {
         return sendError(res, 400, 'Exercise name is required');
@@ -62,9 +78,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         return sendError(res, 400, 'Exercise already exists');
       }
 
+      const primary = primaryMuscleGroups ?? [];
+      const secondary = secondaryMuscleGroups ?? [];
+
       const exercise = new Exercise({
         name,
-        muscleGroups: muscleGroups || [],
+        primaryMuscleGroups: primary,
+        secondaryMuscleGroups: secondary,
         description,
         category: category || 'strength',
         isCustom: true,
@@ -94,13 +114,27 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         return sendError(res, 404, 'Exercise not found');
       }
 
-      if (!exercise.isCustom || exercise.createdByUserId?.toString() !== user.userId) {
-        return sendError(res, 403, 'You can only edit your own custom exercises');
+      const isOwner =
+        exercise.isCustom && exercise.createdByUserId?.toString() === user.userId;
+      const userDoc = await User.findById(user.userId).select('isAdmin').lean();
+      const isAdmin = !!(userDoc as { isAdmin?: boolean })?.isAdmin;
+      if (
+        !isOwner &&
+        !(isAdmin && !exercise.isCustom)
+      ) {
+        return sendError(res, 403, 'You can only edit your own custom exercises or built-in exercises as admin');
       }
 
-      const { name, muscleGroups, description, category } = req.body;
+      const {
+        name,
+        primaryMuscleGroups,
+        secondaryMuscleGroups,
+        description,
+        category,
+      } = req.body;
       if (name) exercise.name = name;
-      if (muscleGroups !== undefined) exercise.muscleGroups = muscleGroups;
+      if (primaryMuscleGroups !== undefined) exercise.primaryMuscleGroups = primaryMuscleGroups;
+      if (secondaryMuscleGroups !== undefined) exercise.secondaryMuscleGroups = secondaryMuscleGroups;
       if (description !== undefined) exercise.description = description;
       if (category) exercise.category = category;
 
@@ -126,8 +160,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         return sendError(res, 404, 'Exercise not found');
       }
 
-      if (!exercise.isCustom || exercise.createdByUserId?.toString() !== user.userId) {
-        return sendError(res, 403, 'You can only delete your own custom exercises');
+      const isOwner =
+        exercise.isCustom && exercise.createdByUserId?.toString() === user.userId;
+      const userDoc = await User.findById(user.userId).select('isAdmin').lean();
+      const isAdmin = !!(userDoc as { isAdmin?: boolean })?.isAdmin;
+      if (
+        !isOwner &&
+        !(isAdmin && !exercise.isCustom)
+      ) {
+        return sendError(res, 403, 'You can only delete your own custom exercises or built-in exercises as admin');
       }
 
       await exercise.deleteOne();

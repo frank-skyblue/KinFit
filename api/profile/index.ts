@@ -40,6 +40,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           totalWorkouts: userDoc.totalWorkouts,
           currentStreak: userDoc.currentStreak,
           settings: userDoc.settings,
+          isAdmin: userDoc.isAdmin,
           createdAt: userDoc.createdAt,
         },
       });
@@ -106,6 +107,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           totalWorkouts: userDoc.totalWorkouts,
           currentStreak: userDoc.currentStreak,
           settings: userDoc.settings,
+          isAdmin: userDoc.isAdmin,
           createdAt: userDoc.createdAt,
         },
       });

@@ -6,7 +6,7 @@ interface RadioOption {
 interface FormRadioGroupProps {
   label: string;
   name: string;
-  options: RadioOption[];
+  options: ReadonlyArray<RadioOption>;
   value: string;
   onChange: (value: string) => void;
   className?: string;

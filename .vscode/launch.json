@@ -103,6 +103,76 @@
       ]
     },
     {
+      "name": "Run: Migrate Legacy Set Entries",
+      "type": "node",
+      "request": "launch",
+      "cwd": "${workspaceFolder}/back-end",
+      "runtimeArgs": [
+        "-r",
+        "ts-node/register"
+      ],
+      "args": [
+        "${workspaceFolder}/back-end/src/scripts/migrateLegacySetEntries.ts"
+      ],
+      "env": {
+        "TS_NODE_PROJECT": "${workspaceFolder}/back-end/tsconfig.json"
+      },
+      "sourceMaps": true,
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "skipFiles": [
+        "<node_internals>/**",
+        "**/node_modules/**"
+      ]
+    },
+    {
+      "name": "PROD: Migrate Legacy Set Entries",
+      "type": "node",
+      "request": "launch",
+      "cwd": "${workspaceFolder}/back-end",
+      "runtimeArgs": [
+        "-r",
+        "ts-node/register"
+      ],
+      "args": [
+        "${workspaceFolder}/back-end/src/scripts/migrateLegacySetEntries.ts"
+      ],
+      "envFile": "${workspaceFolder}/.env.production",
+      "env": {
+        "TS_NODE_PROJECT": "${workspaceFolder}/back-end/tsconfig.json"
+      },
+      "sourceMaps": true,
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "skipFiles": [
+        "<node_internals>/**",
+        "**/node_modules/**"
+      ]
+    },
+    {
+      "name": "Run: Migrate Muscle Groups",
+      "type": "node",
+      "request": "launch",
+      "cwd": "${workspaceFolder}/back-end",
+      "runtimeArgs": [
+        "-r",
+        "ts-node/register"
+      ],
+      "args": [
+        "${workspaceFolder}/back-end/src/scripts/migrateMuscleGroupsToPrimary.ts"
+      ],
+      "env": {
+        "TS_NODE_PROJECT": "${workspaceFolder}/back-end/tsconfig.json"
+      },
+      "sourceMaps": true,
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "skipFiles": [
+        "<node_internals>/**",
+        "**/node_modules/**"
+      ]
+    },
+    {
       "name": "Run: Seed from Journal (Dry Run)",
       "type": "node",
       "request": "launch",

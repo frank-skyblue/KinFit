@@ -8,7 +8,8 @@
     "dev:backend": "cd back-end && npm run dev",
     "dev:frontend": "cd front-end && npm run dev",
     "build": "npm install --prefix front-end && npm run build --prefix front-end",
-    "vercel-build": "npm run build"
+    "vercel-build": "npm run build",
+    "migrate-legacy-set-entries": "cd back-end && npm run migrate-legacy-set-entries"
   },
   "dependencies": {
     "bcryptjs": "^3.0.2",

@@ -3,25 +3,23 @@ import { Exercise } from '../../services/api';
 import { getApiErrorMessage } from '../../utils/errors';
 import {
   ALLOWED_MUSCLE_GROUPS,
-  MUSCLE_GROUP_SECTIONS,
   formatMuscleGroupLabel,
 } from '../../constants/muscleGroups';
+import type { MuscleGroup } from '../../constants/muscleGroups';
+import { DEFAULT_EXERCISE_CATEGORY, EXERCISE_CATEGORY_OPTIONS, type ExerciseCategory } from '../../constants/options';
 import ErrorAlert from '../common/ErrorAlert';
-
-type ExerciseCategory = 'strength' | 'cardio' | 'flexibility' | 'other';
 
 interface ExerciseFormModalProps {
   exercise?: Exercise | null;
-  onSave: (data: { name: string; muscleGroups: string[]; category: string; description: string }) => Promise<void>;
+  onSave: (data: {
+    name: string;
+    primaryMuscleGroups: MuscleGroup[];
+    secondaryMuscleGroups: MuscleGroup[];
+    category: ExerciseCategory;
+    description: string;
+  }) => Promise<void>;
   onClose: () => void;
 }
-
-const CATEGORY_OPTIONS: { value: ExerciseCategory; label: string }[] = [
-  { value: 'strength', label: 'Strength' },
-  { value: 'cardio', label: 'Cardio' },
-  { value: 'flexibility', label: 'Flexibility' },
-  { value: 'other', label: 'Other' },
-];
 
 const ExerciseFormModal = ({ exercise, onSave, onClose }: ExerciseFormModalProps) => {
   const isEdit = !!exercise;
@@ -30,19 +28,24 @@ const ExerciseFormModal = ({ exercise, onSave, onClose }: ExerciseFormModalProps
   const [error, setError] = useState('');
 
   const [name, setName] = useState(exercise ? exercise.name : '');
-  const [muscleGroups, setMuscleGroups] = useState<string[]>(() => {
-    if (!exercise || !exercise.muscleGroups?.length) return [];
-    const allowed = new Set(ALLOWED_MUSCLE_GROUPS);
-    const mapped = exercise.muscleGroups
-      .map((g) => {
-        const v = String(g).trim().toLowerCase();
-        return v === 'full body' ? 'mobility' : v;
-      })
-      .filter((g) => g && allowed.has(g as typeof ALLOWED_MUSCLE_GROUPS[number]));
-    return [...new Set(mapped)].sort();
+  const allowed = new Set(ALLOWED_MUSCLE_GROUPS);
+  const normalize = (g: string) => {
+    const v = String(g).trim().toLowerCase();
+    return v === 'full body' ? 'mobility' : v;
+  };
+  const filterAllowed = (groups: string[]): MuscleGroup[] =>
+    [...new Set(groups.map(normalize).filter((g) => g && allowed.has(g as MuscleGroup)))].sort() as MuscleGroup[];
+
+  const [primaryMuscleGroups, setPrimaryMuscleGroups] = useState<MuscleGroup[]>(() => {
+    if (!exercise || !exercise.primaryMuscleGroups?.length) return [];
+    return filterAllowed(exercise.primaryMuscleGroups);
+  });
+  const [secondaryMuscleGroups, setSecondaryMuscleGroups] = useState<MuscleGroup[]>(() => {
+    if (!exercise || !exercise.secondaryMuscleGroups?.length) return [];
+    return filterAllowed(exercise.secondaryMuscleGroups);
   });
   const [category, setCategory] = useState<ExerciseCategory>(
-    (exercise ? exercise.category : 'strength') as ExerciseCategory
+    exercise?.category ?? DEFAULT_EXERCISE_CATEGORY
   );
   const [description, setDescription] = useState(exercise ? (exercise.description || '') : '');
 
@@ -86,8 +89,14 @@ const ExerciseFormModal = ({ exercise, onSave, onClose }: ExerciseFormModalProps
     if (e.target === e.currentTarget && !isSaving) onClose();
   };
 
-  const handleMuscleGroupToggle = (value: string) => {
-    setMuscleGroups((prev) =>
+  const handlePrimaryToggle = (value: MuscleGroup) => {
+    setPrimaryMuscleGroups((prev) =>
+      prev.includes(value) ? prev.filter((g) => g !== value) : [...prev, value].sort()
+    );
+  };
+
+  const handleSecondaryToggle = (value: MuscleGroup) => {
+    setSecondaryMuscleGroups((prev) =>
       prev.includes(value) ? prev.filter((g) => g !== value) : [...prev, value].sort()
     );
   };
@@ -97,7 +106,13 @@ const ExerciseFormModal = ({ exercise, onSave, onClose }: ExerciseFormModalProps
     setError('');
     setIsSaving(true);
     try {
-      await onSave({ name, muscleGroups: [...muscleGroups].sort(), category, description });
+      await onSave({
+        name,
+        primaryMuscleGroups: [...primaryMuscleGroups].sort(),
+        secondaryMuscleGroups: [...secondaryMuscleGroups].sort(),
+        category,
+        description,
+      });
     } catch (err: unknown) {
       setError(getApiErrorMessage(err) || 'Something went wrong');
       setIsSaving(false);
@@ -160,7 +175,7 @@ const ExerciseFormModal = ({ exercise, onSave, onClose }: ExerciseFormModalProps
               onChange={(e) => setCategory(e.target.value as ExerciseCategory)}
               className="w-full px-4 py-2.5 border border-kin-stone-300 rounded-kin-sm focus:ring-2 focus:ring-kin-coral focus:border-transparent outline-none transition font-inter"
             >
-              {CATEGORY_OPTIONS.map((opt) => (
+              {EXERCISE_CATEGORY_OPTIONS.map((opt) => (
                 <option key={opt.value} value={opt.value}>{opt.label}</option>
               ))}
             </select>
@@ -168,50 +183,74 @@ const ExerciseFormModal = ({ exercise, onSave, onClose }: ExerciseFormModalProps
 
           <div>
             <label className="block text-sm font-medium font-inter text-kin-navy mb-1.5">
-              Muscle Groups
+              Primary Muscle Groups
             </label>
-            {muscleGroups.length > 0 && (
+            {(primaryMuscleGroups.length > 0 || secondaryMuscleGroups.length > 0) && (
               <div className="flex flex-wrap gap-1.5 mb-2">
-                {muscleGroups.map((value) => (
+                {primaryMuscleGroups.map((value) => (
                   <span
-                    key={value}
-                    className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium font-inter bg-kin-coral-100 text-kin-coral-800"
+                    key={`p-${value}`}
+                    className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium font-inter bg-kin-coral-100 text-kin-coral-800"
+                  >
+                    {formatMuscleGroupLabel(value)}
+                  </span>
+                ))}
+                {secondaryMuscleGroups.map((value) => (
+                  <span
+                    key={`s-${value}`}
+                    className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium font-inter bg-kin-stone-200 text-kin-stone-700"
                   >
                     {formatMuscleGroupLabel(value)}
                   </span>
                 ))}
               </div>
             )}
-            <div className="max-h-44 overflow-y-auto border border-kin-stone-300 rounded-kin-sm p-3 bg-kin-stone-50">
-              <div className="space-y-4">
-                {MUSCLE_GROUP_SECTIONS.map(({ label, values }) => (
-                  <div key={label}>
-                    <p className="text-xs font-semibold font-inter text-kin-stone-500 uppercase tracking-wide mb-2">
-                      {label}
-                    </p>
-                    <div className="grid grid-cols-2 gap-x-4 gap-y-1.5">
-                      {values.map((value) => (
-                        <label
-                          key={value}
-                          className="flex items-center gap-2 cursor-pointer font-inter text-sm text-kin-navy hover:bg-kin-stone-100 rounded px-2 py-1 -mx-2 -my-1"
-                        >
-                          <input
-                            type="checkbox"
-                            checked={muscleGroups.includes(value)}
-                            onChange={() => handleMuscleGroupToggle(value)}
-                            className="rounded border-kin-stone-400 text-kin-coral focus:ring-kin-coral"
-                            aria-label={`Select ${formatMuscleGroupLabel(value)}`}
-                          />
-                          <span>{formatMuscleGroupLabel(value)}</span>
-                        </label>
-                      ))}
-                    </div>
-                  </div>
+            <div className="max-h-36 overflow-y-auto border border-kin-stone-300 rounded-kin-sm p-3 bg-kin-stone-50 mb-3">
+              <p className="text-xs font-semibold font-inter text-kin-stone-500 uppercase tracking-wide mb-2">
+                Primary (1× volume)
+              </p>
+              <div className="grid grid-cols-2 gap-x-4 gap-y-1.5">
+                {ALLOWED_MUSCLE_GROUPS.map((value) => (
+                  <label
+                    key={value}
+                    className="flex items-center gap-2 cursor-pointer font-inter text-sm text-kin-navy hover:bg-kin-stone-100 rounded px-2 py-1 -mx-2 -my-1"
+                  >
+                    <input
+                      type="checkbox"
+                      checked={primaryMuscleGroups.includes(value)}
+                      onChange={() => handlePrimaryToggle(value)}
+                      className="rounded border-kin-stone-400 text-kin-coral focus:ring-kin-coral"
+                      aria-label={`Primary: ${formatMuscleGroupLabel(value)}`}
+                    />
+                    <span>{formatMuscleGroupLabel(value)}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+            <div className="max-h-36 overflow-y-auto border border-kin-stone-300 rounded-kin-sm p-3 bg-kin-stone-50">
+              <p className="text-xs font-semibold font-inter text-kin-stone-500 uppercase tracking-wide mb-2">
+                Secondary (0.5× volume)
+              </p>
+              <div className="grid grid-cols-2 gap-x-4 gap-y-1.5">
+                {ALLOWED_MUSCLE_GROUPS.map((value) => (
+                  <label
+                    key={value}
+                    className="flex items-center gap-2 cursor-pointer font-inter text-sm text-kin-navy hover:bg-kin-stone-100 rounded px-2 py-1 -mx-2 -my-1"
+                  >
+                    <input
+                      type="checkbox"
+                      checked={secondaryMuscleGroups.includes(value)}
+                      onChange={() => handleSecondaryToggle(value)}
+                      className="rounded border-kin-stone-400 text-kin-stone-600 focus:ring-kin-stone-500"
+                      aria-label={`Secondary: ${formatMuscleGroupLabel(value)}`}
+                    />
+                    <span>{formatMuscleGroupLabel(value)}</span>
+                  </label>
                 ))}
               </div>
             </div>
             <p className="text-xs text-kin-teal font-inter mt-1">
-              Select all that apply
+              Primary = main muscles. Secondary = supporting (counts half in volume)
             </p>
           </div>
 

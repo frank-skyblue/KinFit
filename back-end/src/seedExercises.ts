@@ -4,53 +4,53 @@ import { connectDB } from './services/mongooseService';
 
 const defaultExercises = [
   // Chest
-  { name: 'Bench Press', muscleGroups: ['chest', 'triceps', 'shoulders'], category: 'strength' },
-  { name: 'Incline Bench Press', muscleGroups: ['chest', 'shoulders', 'triceps'], category: 'strength' },
-  { name: 'Dumbbell Flyes', muscleGroups: ['chest'], category: 'strength' },
-  { name: 'Push-ups', muscleGroups: ['chest', 'triceps', 'core'], category: 'strength' },
-  { name: 'Cable Crossover', muscleGroups: ['chest'], category: 'strength' },
-  
+  { name: 'Bench Press', primaryMuscleGroups: ['chest', 'triceps', 'shoulders'], secondaryMuscleGroups: [], category: 'strength' },
+  { name: 'Incline Bench Press', primaryMuscleGroups: ['chest', 'shoulders', 'triceps'], secondaryMuscleGroups: [], category: 'strength' },
+  { name: 'Dumbbell Flyes', primaryMuscleGroups: ['chest'], secondaryMuscleGroups: [], category: 'strength' },
+  { name: 'Push-ups', primaryMuscleGroups: ['chest', 'triceps', 'core'], secondaryMuscleGroups: [], category: 'strength' },
+  { name: 'Cable Crossover', primaryMuscleGroups: ['chest'], secondaryMuscleGroups: [], category: 'strength' },
+
   // Back
-  { name: 'Deadlift', muscleGroups: ['back', 'legs', 'core'], category: 'strength' },
-  { name: 'Pull-ups', muscleGroups: ['back', 'biceps'], category: 'strength' },
-  { name: 'Barbell Row', muscleGroups: ['back', 'biceps'], category: 'strength' },
-  { name: 'Lat Pulldown', muscleGroups: ['back', 'biceps'], category: 'strength' },
-  { name: 'Dumbbell Row', muscleGroups: ['back', 'biceps'], category: 'strength' },
-  { name: 'Seated Cable Row', muscleGroups: ['back', 'biceps'], category: 'strength' },
-  
+  { name: 'Deadlift', primaryMuscleGroups: ['back', 'legs', 'core'], secondaryMuscleGroups: [], category: 'strength' },
+  { name: 'Pull-ups', primaryMuscleGroups: ['back', 'biceps'], secondaryMuscleGroups: [], category: 'strength' },
+  { name: 'Barbell Row', primaryMuscleGroups: ['back', 'biceps'], secondaryMuscleGroups: [], category: 'strength' },
+  { name: 'Lat Pulldown', primaryMuscleGroups: ['back', 'biceps'], secondaryMuscleGroups: [], category: 'strength' },
+  { name: 'Dumbbell Row', primaryMuscleGroups: ['back', 'biceps'], secondaryMuscleGroups: [], category: 'strength' },
+  { name: 'Seated Cable Row', primaryMuscleGroups: ['back', 'biceps'], secondaryMuscleGroups: [], category: 'strength' },
+
   // Shoulders
-  { name: 'Overhead Press', muscleGroups: ['shoulders', 'triceps'], category: 'strength' },
-  { name: 'Lateral Raises', muscleGroups: ['shoulders'], category: 'strength' },
-  { name: 'Front Raises', muscleGroups: ['shoulders'], category: 'strength' },
-  { name: 'Rear Delt Flyes', muscleGroups: ['shoulders', 'back'], category: 'strength' },
-  { name: 'Arnold Press', muscleGroups: ['shoulders', 'triceps'], category: 'strength' },
-  
+  { name: 'Overhead Press', primaryMuscleGroups: ['shoulders', 'triceps'], secondaryMuscleGroups: [], category: 'strength' },
+  { name: 'Lateral Raises', primaryMuscleGroups: ['shoulders'], secondaryMuscleGroups: [], category: 'strength' },
+  { name: 'Front Raises', primaryMuscleGroups: ['shoulders'], secondaryMuscleGroups: [], category: 'strength' },
+  { name: 'Rear Delt Flyes', primaryMuscleGroups: ['shoulders', 'back'], secondaryMuscleGroups: [], category: 'strength' },
+  { name: 'Arnold Press', primaryMuscleGroups: ['shoulders', 'triceps'], secondaryMuscleGroups: [], category: 'strength' },
+
   // Arms
-  { name: 'Bicep Curls', muscleGroups: ['biceps'], category: 'strength' },
-  { name: 'Hammer Curls', muscleGroups: ['biceps', 'forearms'], category: 'strength' },
-  { name: 'Tricep Dips', muscleGroups: ['triceps', 'chest'], category: 'strength' },
-  { name: 'Tricep Pushdown', muscleGroups: ['triceps'], category: 'strength' },
-  { name: 'Skull Crushers', muscleGroups: ['triceps'], category: 'strength' },
-  
+  { name: 'Bicep Curls', primaryMuscleGroups: ['biceps'], secondaryMuscleGroups: [], category: 'strength' },
+  { name: 'Hammer Curls', primaryMuscleGroups: ['biceps', 'forearms'], secondaryMuscleGroups: [], category: 'strength' },
+  { name: 'Tricep Dips', primaryMuscleGroups: ['triceps', 'chest'], secondaryMuscleGroups: [], category: 'strength' },
+  { name: 'Tricep Pushdown', primaryMuscleGroups: ['triceps'], secondaryMuscleGroups: [], category: 'strength' },
+  { name: 'Skull Crushers', primaryMuscleGroups: ['triceps'], secondaryMuscleGroups: [], category: 'strength' },
+
   // Legs
-  { name: 'Squat', muscleGroups: ['legs', 'glutes', 'core'], category: 'strength' },
-  { name: 'Leg Press', muscleGroups: ['legs', 'glutes'], category: 'strength' },
-  { name: 'Leg Curls', muscleGroups: ['hamstrings'], category: 'strength' },
-  { name: 'Leg Extensions', muscleGroups: ['quadriceps'], category: 'strength' },
-  { name: 'Lunges', muscleGroups: ['legs', 'glutes'], category: 'strength' },
-  { name: 'Calf Raises', muscleGroups: ['calves'], category: 'strength' },
-  
+  { name: 'Squat', primaryMuscleGroups: ['legs', 'glutes', 'core'], secondaryMuscleGroups: [], category: 'strength' },
+  { name: 'Leg Press', primaryMuscleGroups: ['legs', 'glutes'], secondaryMuscleGroups: [], category: 'strength' },
+  { name: 'Leg Curls', primaryMuscleGroups: ['hamstrings'], secondaryMuscleGroups: [], category: 'strength' },
+  { name: 'Leg Extensions', primaryMuscleGroups: ['quadriceps'], secondaryMuscleGroups: [], category: 'strength' },
+  { name: 'Lunges', primaryMuscleGroups: ['legs', 'glutes'], secondaryMuscleGroups: [], category: 'strength' },
+  { name: 'Calf Raises', primaryMuscleGroups: ['calves'], secondaryMuscleGroups: [], category: 'strength' },
+
   // Core
-  { name: 'Plank', muscleGroups: ['core', 'abs'], category: 'strength' },
-  { name: 'Crunches', muscleGroups: ['abs'], category: 'strength' },
-  { name: 'Russian Twists', muscleGroups: ['abs', 'obliques'], category: 'strength' },
-  { name: 'Leg Raises', muscleGroups: ['abs', 'core'], category: 'strength' },
-  
+  { name: 'Plank', primaryMuscleGroups: ['core', 'abs'], secondaryMuscleGroups: [], category: 'strength' },
+  { name: 'Crunches', primaryMuscleGroups: ['abs'], secondaryMuscleGroups: [], category: 'strength' },
+  { name: 'Russian Twists', primaryMuscleGroups: ['abs', 'obliques'], secondaryMuscleGroups: [], category: 'strength' },
+  { name: 'Leg Raises', primaryMuscleGroups: ['abs', 'core'], secondaryMuscleGroups: [], category: 'strength' },
+
   // Cardio
-  { name: 'Running', muscleGroups: ['legs', 'cardio'], category: 'cardio' },
-  { name: 'Cycling', muscleGroups: ['legs', 'cardio'], category: 'cardio' },
-  { name: 'Jump Rope', muscleGroups: ['full body', 'cardio'], category: 'cardio' },
-  { name: 'Rowing', muscleGroups: ['back', 'legs', 'cardio'], category: 'cardio' },
+  { name: 'Running', primaryMuscleGroups: ['legs', 'cardio'], secondaryMuscleGroups: [], category: 'cardio' },
+  { name: 'Cycling', primaryMuscleGroups: ['legs', 'cardio'], secondaryMuscleGroups: [], category: 'cardio' },
+  { name: 'Jump Rope', primaryMuscleGroups: ['full body', 'cardio'], secondaryMuscleGroups: [], category: 'cardio' },
+  { name: 'Rowing', primaryMuscleGroups: ['back', 'legs', 'cardio'], secondaryMuscleGroups: [], category: 'cardio' },
 ];
 
 const seedExercises = async () => {

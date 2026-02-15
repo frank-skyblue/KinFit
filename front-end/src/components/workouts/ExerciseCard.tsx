@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { ExerciseEntry, SetEntry, getSetEntries, buildNotationSummary } from '../../services/api';
+import { DEFAULT_EXERCISE_CATEGORY, EXERCISE_CATEGORY, type ExerciseCategory, WEIGHT_TYPE_OPTIONS } from '../../constants/options';
 import FormInput from '../common/FormInput';
 import FormSelect from '../common/FormSelect';
 
@@ -18,12 +19,6 @@ interface ExerciseCardProps {
   forceCollapsed?: boolean;
 }
 
-const WEIGHT_TYPE_OPTIONS = [
-  { value: 'a', label: 'act' },
-  { value: 'e', label: 'ea' },
-  { value: 'bw', label: 'bw' },
-];
-
 const SETS_OPTIONS = Array.from({ length: 10 }, (_, i) => ({
   value: String(i + 1),
   label: String(i + 1),
@@ -40,7 +35,7 @@ const ExerciseCard = ({ exercise, index, units, onUpdate, onRemove, dragHandlePr
   const [isExpanded, setIsExpanded] = useState(false);
   const showExpanded = isExpanded && !forceCollapsed;
 
-  const category = exercise.category || 'strength';
+  const category: ExerciseCategory = exercise.category || DEFAULT_EXERCISE_CATEGORY;
   const entries = getSetEntries(exercise);
   const notationSummary = buildNotationSummary(exercise);
 
@@ -49,7 +44,7 @@ const ExerciseCard = ({ exercise, index, units, onUpdate, onRemove, dragHandlePr
     const updated: SetEntry = { ...newEntries[entryIndex], [field]: value };
 
     // Clear weight when switching to bodyweight
-    if (field === 'weightType' && value === 'bw') {
+    if (field === 'weightType' && (value as string) === 'bw') {
       updated.weightValue = undefined;
     }
 
@@ -152,7 +147,7 @@ const ExerciseCard = ({ exercise, index, units, onUpdate, onRemove, dragHandlePr
       {showExpanded && (
         <div className="px-3 pb-3 space-y-2 border-t border-kin-stone-100">
           {/* "other" category — notes only, no set entry rows */}
-          {category === 'other' ? (
+          {category === EXERCISE_CATEGORY.OTHER ? (
             <FormInput
               label="Notes"
               size="compact"
@@ -166,7 +161,7 @@ const ExerciseCard = ({ exercise, index, units, onUpdate, onRemove, dragHandlePr
               {/* Set entry rows */}
               {entries.map((entry, entryIndex) => (
                 <div key={entryIndex} className="flex items-end gap-2">
-                  {category === 'cardio' ? (
+                  {category === EXERCISE_CATEGORY.CARDIO ? (
                     /* ── Cardio row: Duration + Zone ── */
                     <>
                       <div className="flex-3 min-w-20">
@@ -191,7 +186,7 @@ const ExerciseCard = ({ exercise, index, units, onUpdate, onRemove, dragHandlePr
                         />
                       </div>
                     </>
-                  ) : category === 'flexibility' ? (
+                  ) : category === EXERCISE_CATEGORY.FLEXIBILITY ? (
                     /* ── Flexibility row: Duration only ── */
                     <div className="flex-3 min-w-20">
                       <FormInput

@@ -76,6 +76,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         units: user.units,
         totalWorkouts: user.totalWorkouts,
         currentStreak: user.currentStreak,
+        isAdmin: user.isAdmin,
       },
     });
   } catch (error) {

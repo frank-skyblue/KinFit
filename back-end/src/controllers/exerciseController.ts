@@ -1,6 +1,7 @@
 import { Response } from 'express';
 import { AuthRequest } from '../middleware/authMiddleware';
 import Exercise from '../models/Exercise';
+import User from '../models/User';
 import { sendError } from '../utils/errorResponse';
 import mongoose from 'mongoose';
 
@@ -22,7 +23,16 @@ export const getExercises = async (req: AuthRequest, res: Response): Promise<voi
     }
 
     if (muscleGroup) {
-      query.muscleGroups = muscleGroup;
+      query.$and = [
+        { $or: query.$or },
+        {
+          $or: [
+            { primaryMuscleGroups: muscleGroup },
+            { secondaryMuscleGroups: muscleGroup },
+          ],
+        },
+      ];
+      delete query.$or;
     }
 
     const exercises = await Exercise.find(query).sort({ name: 1 }).limit(500);
@@ -42,7 +52,13 @@ export const createExercise = async (req: AuthRequest, res: Response): Promise<v
       return sendError(res, 401, 'User not authenticated');
     }
 
-    const { name, muscleGroups, description, category } = req.body;
+    const {
+      name,
+      primaryMuscleGroups,
+      secondaryMuscleGroups,
+      description,
+      category,
+    } = req.body;
 
     if (!name) {
       return sendError(res, 400, 'Exercise name is required');
@@ -57,9 +73,13 @@ export const createExercise = async (req: AuthRequest, res: Response): Promise<v
       return sendError(res, 400, 'Exercise already exists');
     }
 
+    const primary = primaryMuscleGroups ?? [];
+    const secondary = secondaryMuscleGroups ?? [];
+
     const exercise = new Exercise({
       name,
-      muscleGroups: muscleGroups || [],
+      primaryMuscleGroups: primary,
+      secondaryMuscleGroups: secondary,
       description,
       category: category || 'strength',
       isCustom: true,
@@ -110,14 +130,24 @@ export const updateExercise = async (req: AuthRequest, res: Response): Promise<v
       return sendError(res, 404, 'Exercise not found');
     }
 
-    if (!exercise.isCustom || exercise.createdByUserId?.toString() !== userId) {
-      return sendError(res, 403, 'You can only edit your own custom exercises');
+    const isOwner = exercise.isCustom && exercise.createdByUserId?.toString() === userId;
+    const user = await User.findById(userId).select('isAdmin').lean();
+    const isAdmin = !!user?.isAdmin;
+    if (!isOwner && !(isAdmin && !exercise.isCustom)) {
+      return sendError(res, 403, 'You can only edit your own custom exercises or built-in exercises as admin');
     }
 
-    const { name, muscleGroups, description, category } = req.body;
+    const {
+      name,
+      primaryMuscleGroups,
+      secondaryMuscleGroups,
+      description,
+      category,
+    } = req.body;
 
     if (name) exercise.name = name;
-    if (muscleGroups !== undefined) exercise.muscleGroups = muscleGroups;
+    if (primaryMuscleGroups !== undefined) exercise.primaryMuscleGroups = primaryMuscleGroups;
+    if (secondaryMuscleGroups !== undefined) exercise.secondaryMuscleGroups = secondaryMuscleGroups;
     if (description !== undefined) exercise.description = description;
     if (category) exercise.category = category;
 
@@ -145,8 +175,11 @@ export const deleteExercise = async (req: AuthRequest, res: Response): Promise<v
       return sendError(res, 404, 'Exercise not found');
     }
 
-    if (!exercise.isCustom || exercise.createdByUserId?.toString() !== userId) {
-      return sendError(res, 403, 'You can only delete your own custom exercises');
+    const isOwner = exercise.isCustom && exercise.createdByUserId?.toString() === userId;
+    const user = await User.findById(userId).select('isAdmin').lean();
+    const isAdmin = !!user?.isAdmin;
+    if (!isOwner && !(isAdmin && !exercise.isCustom)) {
+      return sendError(res, 403, 'You can only delete your own custom exercises or built-in exercises as admin');
     }
 
     await exercise.deleteOne();

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { getVisibilityDisplay } from '../../constants/options';
 import Layout from '../dashboard/Layout';
 import LoadingSpinner from '../common/LoadingSpinner';
 import { getWorkouts, Workout } from '../../services/api';
@@ -73,49 +74,52 @@ const WorkoutList = () => {
         ) : (
           <>
             <div className="space-y-4 mb-6">
-              {workouts.map((workout) => (
-                <Link
-                  key={workout._id}
-                  to={`/workouts/${workout._id}`}
-                  className="block bg-white rounded-kin-lg shadow-kin-medium p-6 hover:shadow-kin-strong transition"
-                >
-                  <div className="flex items-start justify-between mb-4">
-                    <div>
-                      <h3 className="text-xl font-bold font-montserrat text-kin-navy mb-1">
-                        {workout.title || 'Workout Session'}
-                      </h3>
-                      <p className="text-sm text-kin-teal font-inter">
-                        {formatDateWithWeekday(workout.date)}
-                      </p>
+              {workouts.map((workout) => {
+                const { icon: visibilityIcon, shortLabel: visibilityLabel } = getVisibilityDisplay(workout.visibility);
+                return (
+                  <Link
+                    key={workout._id}
+                    to={`/workouts/${workout._id}`}
+                    className="block bg-white rounded-kin-lg shadow-kin-medium p-6 hover:shadow-kin-strong transition"
+                  >
+                    <div className="flex items-start justify-between mb-4">
+                      <div>
+                        <h3 className="text-xl font-bold font-montserrat text-kin-navy mb-1">
+                          {workout.title || 'Workout Session'}
+                        </h3>
+                        <p className="text-sm text-kin-teal font-inter">
+                          {formatDateWithWeekday(workout.date)}
+                        </p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-sm text-kin-teal font-inter">Total Volume</p>
+                        <p className="text-2xl font-bold font-montserrat text-kin-navy">
+                          {workout.totalVolume.toLocaleString()}
+                        </p>
+                        <p className="text-xs text-kin-teal font-inter">{user!.units}</p>
+                      </div>
                     </div>
-                    <div className="text-right">
-                      <p className="text-sm text-kin-teal font-inter">Total Volume</p>
-                      <p className="text-2xl font-bold font-montserrat text-kin-navy">
-                        {workout.totalVolume.toLocaleString()}
-                      </p>
-                      <p className="text-xs text-kin-teal font-inter">{user!.units}</p>
+
+                    <div className="flex items-center gap-4 text-sm text-kin-teal font-inter">
+                      <span>🏋️ {workout.exercises.length} exercises</span>
+                      {workout.duration && <span>⏱️ {workout.duration} min</span>}
+                      <span className={`px-2 py-1 rounded-full text-xs ${
+                        workout.visibility === 'shared'
+                          ? 'bg-kin-coral-100 text-kin-coral-700'
+                          : 'bg-kin-stone-100 text-kin-stone-700'
+                      }`}>
+                        {visibilityIcon} {visibilityLabel}
+                      </span>
                     </div>
-                  </div>
 
-                  <div className="flex items-center gap-4 text-sm text-kin-teal font-inter">
-                    <span>🏋️ {workout.exercises.length} exercises</span>
-                    {workout.duration && <span>⏱️ {workout.duration} min</span>}
-                    <span className={`px-2 py-1 rounded-full text-xs ${
-                      workout.visibility === 'shared' 
-                        ? 'bg-kin-coral-100 text-kin-coral-700'
-                        : 'bg-kin-stone-100 text-kin-stone-700'
-                    }`}>
-                      {workout.visibility === 'shared' ? '👥 Shared' : '🔒 Private'}
-                    </span>
-                  </div>
-
-                  {workout.notes && (
-                    <p className="mt-3 text-sm text-kin-navy font-inter line-clamp-2">
-                      {workout.notes}
-                    </p>
-                  )}
-                </Link>
-              ))}
+                    {workout.notes && (
+                      <p className="mt-3 text-sm text-kin-navy font-inter line-clamp-2">
+                        {workout.notes}
+                      </p>
+                    )}
+                  </Link>
+                );
+              })}
             </div>
 
             {/* Pagination */}

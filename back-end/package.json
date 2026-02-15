@@ -12,6 +12,8 @@
     "seed": "ts-node ./src/seedExercises.ts",
     "parse-journal": "ts-node ./src/scripts/parseGymJournal.ts",
     "seed-journal": "ts-node ./src/scripts/seedFromJournal.ts",
+    "migrate-muscle-groups": "ts-node ./src/scripts/migrateMuscleGroupsToPrimary.ts",
+    "migrate-legacy-set-entries": "ts-node ./src/scripts/migrateLegacySetEntries.ts",
     "seed-journal:dry": "ts-node ./src/scripts/seedFromJournal.ts --dry-run"
   },
   "author": "",

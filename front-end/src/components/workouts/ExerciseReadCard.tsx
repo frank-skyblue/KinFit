@@ -1,4 +1,5 @@
 import { ExerciseEntry, getSetEntries, formatSetNotation } from '../../services/api';
+import { EXERCISE_CATEGORY } from '../../constants/options';
 
 interface ExerciseReadCardProps {
   exercise: ExerciseEntry;
@@ -6,7 +7,7 @@ interface ExerciseReadCardProps {
 }
 
 const ExerciseReadCard = ({ exercise, index }: ExerciseReadCardProps) => {
-  const isOther = exercise.category === 'other';
+  const isOther = exercise.category === EXERCISE_CATEGORY.OTHER;
   const entries = getSetEntries(exercise);
 
   return (

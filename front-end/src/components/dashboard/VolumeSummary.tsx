@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { getVolumeSummary, BodyPartVolume } from '../../services/api';
 import { getApiErrorMessage } from '../../utils/errors';
 import LoadingSpinner from '../common/LoadingSpinner';
@@ -72,6 +72,10 @@ const getVolumeColor = (
   return { bg, text, border };
 };
 
+/** Format volume value for display (handles fractional from secondary 0.5x) */
+const formatVolumeValue = (n: number): string =>
+  n % 1 === 0 ? String(Math.round(n)) : n.toFixed(1);
+
 /** Format days since last trained as a human-readable string */
 const formatDaysSince = (days: number | null): string => {
   if (days === null) return 'Low';
@@ -84,6 +88,8 @@ const VolumeSummary = () => {
   const [bodyParts, setBodyParts] = useState<BodyPartVolume[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [selectedBodyPart, setSelectedBodyPart] = useState<BodyPartVolume | null>(null);
+  const backdropRef = useRef<HTMLDivElement>(null);
 
   const fetchVolumeSummary = async () => {
     setIsLoading(true);
@@ -113,6 +119,23 @@ const VolumeSummary = () => {
   useEffect(() => {
     fetchVolumeSummary();
   }, []);
+
+  useEffect(() => {
+    if (!selectedBodyPart) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setSelectedBodyPart(null);
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [selectedBodyPart]);
+
+  const handleCardClick = (bp: BodyPartVolume) => {
+    setSelectedBodyPart(bp);
+  };
+
+  const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (e.target === backdropRef.current) setSelectedBodyPart(null);
+  };
 
   if (isLoading) {
     return (
@@ -165,13 +188,16 @@ const VolumeSummary = () => {
           const isAboveTarget = actual >= target;
 
           return (
-            <div
+            <button
               key={bp.name}
-              className="rounded-kin-sm p-3 border-l-4 transition"
+              type="button"
+              onClick={() => handleCardClick(bp)}
+              className="rounded-kin-sm p-3 border-l-4 transition text-left w-full cursor-pointer hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-kin-coral focus:ring-offset-2"
               style={{
                 backgroundColor: colors.bg,
                 borderLeftColor: colors.border,
               }}
+              aria-label={`View exercises for ${formatBodyPartName(bp.name)}`}
             >
               <div className="flex items-start justify-between gap-1">
                 <h3
@@ -185,8 +211,8 @@ const VolumeSummary = () => {
                   style={{ color: colors.text }}
                 >
                   {isMinutes
-                    ? `${actual} / ${target} min`
-                    : `${actual}/${target}`}
+                    ? `${formatVolumeValue(actual)} / ${target} min`
+                    : `${formatVolumeValue(actual)}/${target}`}
                 </span>
               </div>
               <div className="flex items-center justify-between mt-1.5">
@@ -206,10 +232,80 @@ const VolumeSummary = () => {
                   </span>
                 )}
               </div>
-            </div>
+            </button>
           );
         })}
       </div>
+
+      {/* Contribution Detail Dialog */}
+      {selectedBodyPart && (
+        <div
+          ref={backdropRef}
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/30"
+          onClick={handleBackdropClick}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="volume-detail-title"
+        >
+          <div
+            className="bg-white rounded-kin-lg shadow-kin-strong w-full max-w-sm overflow-hidden"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="p-4 border-b border-kin-stone-200">
+              <div className="flex items-center justify-between">
+                <h3
+                  id="volume-detail-title"
+                  className="text-lg font-bold font-montserrat text-kin-navy"
+                >
+                  {formatBodyPartName(selectedBodyPart.name)}
+                </h3>
+                <button
+                  type="button"
+                  onClick={() => setSelectedBodyPart(null)}
+                  className="p-1 text-kin-stone-500 hover:text-kin-navy transition"
+                  aria-label="Close"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                  </svg>
+                </button>
+              </div>
+              <p className="text-sm text-kin-stone-500 font-inter mt-1">
+                {selectedBodyPart.unit === 'minutes'
+                  ? `${formatVolumeValue(selectedBodyPart.minutesThisWeek)} / ${selectedBodyPart.targetMinutes} min this week`
+                  : `${formatVolumeValue(selectedBodyPart.setsThisWeek)} / ${selectedBodyPart.targetSets} sets this week`}
+              </p>
+            </div>
+            <div className="max-h-64 overflow-y-auto p-4">
+              {(!selectedBodyPart.contributions?.length) ? (
+                <p className="text-sm text-kin-stone-500 font-inter">
+                  No exercises contributed this week
+                </p>
+              ) : (
+                <ul className="space-y-2">
+                  {selectedBodyPart.contributions.map((c, idx) => (
+                    <li
+                      key={`${c.exerciseName}-${idx}`}
+                      className="flex items-center justify-between text-sm font-inter"
+                    >
+                      <span className="text-kin-navy">{c.exerciseName}</span>
+                      <span className="text-kin-stone-600 font-medium">
+                        {formatVolumeValue(c.amount)}
+                        {selectedBodyPart.unit === 'minutes' ? ' min' : ' sets'}
+                        {c.weight === 0.5 && (
+                          <span className="text-kin-stone-400 text-xs ml-1" title="Secondary (0.5×)">
+                            (sec)
+                          </span>
+                        )}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Legend */}
       <div className="flex items-center justify-center gap-3 mt-3 pt-3 border-t border-kin-stone-100">

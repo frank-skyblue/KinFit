@@ -2,7 +2,8 @@ import mongoose, { Document, Schema } from 'mongoose';
 
 export interface IExercise extends Document {
   name: string;
-  muscleGroups: string[];
+  primaryMuscleGroups: string[];
+  secondaryMuscleGroups: string[];
   isCustom: boolean;
   createdByUserId?: mongoose.Types.ObjectId;
   description?: string;
@@ -14,7 +15,8 @@ export interface IExercise extends Document {
 const exerciseSchema = new Schema<IExercise>(
   {
     name: { type: String, required: true, trim: true },
-    muscleGroups: { type: [String], default: [] },
+    primaryMuscleGroups: { type: [String], default: [] },
+    secondaryMuscleGroups: { type: [String], default: [] },
     isCustom: { type: Boolean, default: false },
     createdByUserId: {
       type: Schema.Types.ObjectId,
@@ -32,7 +34,8 @@ const exerciseSchema = new Schema<IExercise>(
 );
 
 exerciseSchema.index({ name: 'text' });
-exerciseSchema.index({ muscleGroups: 1 });
+exerciseSchema.index({ primaryMuscleGroups: 1 });
+exerciseSchema.index({ secondaryMuscleGroups: 1 });
 exerciseSchema.index({ isCustom: 1, createdByUserId: 1 });
 
 export default mongoose.models.Exercise || mongoose.model<IExercise>('Exercise', exerciseSchema);

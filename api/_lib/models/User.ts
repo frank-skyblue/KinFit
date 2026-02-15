@@ -18,6 +18,7 @@ export interface IUser extends Document {
   // Stats
   totalWorkouts: number;
   currentStreak: number;
+  isAdmin: boolean;
   settings: {
     defaultWorkoutVisibility: 'private' | 'shared';
     notifications: {
@@ -106,6 +107,10 @@ const userSchema = new Schema<IUser>(
     currentStreak: {
       type: Number,
       default: 0,
+    },
+    isAdmin: {
+      type: Boolean,
+      default: false,
     },
     settings: {
       defaultWorkoutVisibility: {

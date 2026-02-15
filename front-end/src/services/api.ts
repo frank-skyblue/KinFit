@@ -1,5 +1,11 @@
-import axios from 'axios';
+import axios, { type AxiosRequestConfig } from 'axios';
 import { AUTH_TOKEN_KEY, USER_KEY } from '../constants/auth';
+import { DURATION_BASED_CATEGORIES, EXERCISE_CATEGORY, type ActivityLevel, type ExerciseCategory, type Gender, type Units, type Visibility, type WeightType } from '../constants/options';
+import type { MuscleGroup } from '../constants/muscleGroups';
+
+// -----------------------------------------------------------------------------
+// Axios Setup
+// -----------------------------------------------------------------------------
 
 // API URL configuration:
 // - VITE_API_URL env var: Use if explicitly set
@@ -36,6 +42,22 @@ api.interceptors.response.use(
   }
 );
 
+/** Wraps axios methods to return response.data directly, reducing boilerplate. */
+const request = {
+  get: <T>(url: string, config?: AxiosRequestConfig): Promise<T> =>
+    api.get<T>(url, config).then((r) => r.data),
+  post: <T>(url: string, data?: unknown, config?: AxiosRequestConfig): Promise<T> =>
+    api.post<T>(url, data, config).then((r) => r.data),
+  put: <T>(url: string, data?: unknown, config?: AxiosRequestConfig): Promise<T> =>
+    api.put<T>(url, data, config).then((r) => r.data),
+  delete: <T>(url: string, config?: AxiosRequestConfig): Promise<T> =>
+    api.delete<T>(url, config).then((r) => r.data),
+};
+
+// -----------------------------------------------------------------------------
+// Types — Auth & User
+// -----------------------------------------------------------------------------
+
 export interface RegisterData {
   username: string;
   email: string;
@@ -56,16 +78,17 @@ export interface User {
   profilePhoto?: string;
   bio?: string;
   fitnessGoals?: string;
-  units: 'lbs' | 'kg';
+  units: Units;
   birthdate?: string;
-  gender?: 'male' | 'female' | 'other' | 'prefer_not_to_say';
+  gender?: Gender;
   height?: number;
   weight?: number;
-  activityLevel?: 'sedentary' | 'light' | 'moderate' | 'active' | 'very_active';
+  activityLevel?: ActivityLevel;
   totalWorkouts: number; // Backend always provides (default 0)
   currentStreak: number; // Backend always provides (default 0)
+  isAdmin?: boolean;
   settings?: {
-    defaultWorkoutVisibility: 'private' | 'shared';
+    defaultWorkoutVisibility: Visibility;
     notifications: {
       partnerPRs: boolean;
       partnerWorkouts: boolean;
@@ -80,20 +103,25 @@ export interface ProfileUpdateData {
   displayName?: string;
   bio?: string;
   fitnessGoals?: string;
-  units?: 'lbs' | 'kg';
+  units?: Units;
   birthdate?: string | null;
-  gender?: 'male' | 'female' | 'other' | 'prefer_not_to_say' | null;
+  gender?: Gender | null;
   height?: number | null;
   weight?: number | null;
-  activityLevel?: 'sedentary' | 'light' | 'moderate' | 'active' | 'very_active' | null;
+  activityLevel?: ActivityLevel | null;
   settings?: User['settings'];
 }
+
+// -----------------------------------------------------------------------------
+// Types — Exercise & Workout
+// -----------------------------------------------------------------------------
 
 export interface Exercise {
   _id: string;
   name: string;
-  muscleGroups: string[];
-  category: string;
+  primaryMuscleGroups: MuscleGroup[];
+  secondaryMuscleGroups: MuscleGroup[];
+  category: ExerciseCategory;
   isCustom: boolean;
   description?: string;
 }
@@ -101,7 +129,7 @@ export interface Exercise {
 export interface SetEntry {
   // Strength fields
   weightValue?: number;
-  weightType?: 'e' | 'a' | 'bw';
+  weightType?: WeightType;
   reps?: number;
   sets?: number;
   // Cardio fields
@@ -112,9 +140,9 @@ export interface SetEntry {
 export interface ExerciseEntry {
   exerciseId: string;
   exerciseName: string;
-  category?: 'strength' | 'cardio' | 'flexibility' | 'other';
+  category?: ExerciseCategory;
   weightValue?: number;
-  weightType?: 'e' | 'a' | 'bw';
+  weightType?: WeightType;
   reps?: number;
   sets?: number;
   setEntries?: SetEntry[];
@@ -123,6 +151,10 @@ export interface ExerciseEntry {
   /** Client-only stable ID for drag-and-drop — stripped before saving */
   _dragId?: string;
 }
+
+// -----------------------------------------------------------------------------
+// Exercise Helpers (createExerciseEntry, getSetEntries, etc.)
+// -----------------------------------------------------------------------------
 
 /** Generate a unique ID — uses crypto.randomUUID() in secure contexts, falls back for plain HTTP */
 let _uid = 0;
@@ -136,31 +168,25 @@ export const createExerciseEntry = (
   exercise: Exercise,
   orderIndex: number
 ): ExerciseEntry => {
-  const cat = exercise.category as ExerciseEntry['category'];
+  const cat = exercise.category;
   let defaultEntries: SetEntry[];
   switch (cat) {
-    case 'cardio':
+    case EXERCISE_CATEGORY.CARDIO:
       defaultEntries = [{ duration: 30, intensityZone: 2 }];
       break;
-    case 'flexibility':
+    case EXERCISE_CATEGORY.FLEXIBILITY:
       defaultEntries = [{ duration: 30 }];
       break;
-    case 'other':
+    case EXERCISE_CATEGORY.OTHER:
       defaultEntries = [];
       break;
     default:
-      defaultEntries = [{ weightValue: 0, weightType: 'a' as const, reps: 10, sets: 3 }];
+      defaultEntries = [{ weightValue: 0, weightType: 'a', reps: 10, sets: 3 }];
   }
-  const isStrength = !cat || cat === 'strength';
-
   return {
     exerciseId: exercise._id,
     exerciseName: exercise.name,
     category: cat,
-    weightValue: isStrength ? 0 : undefined,
-    weightType: isStrength ? 'a' : undefined,
-    reps: isStrength ? 10 : undefined,
-    sets: isStrength ? 3 : undefined,
     setEntries: defaultEntries.length > 0 ? defaultEntries : undefined,
     notes: '',
     orderIndex,
@@ -168,54 +194,44 @@ export const createExerciseEntry = (
   };
 };
 
-/** Resolve set entries from an exercise, falling back to legacy single-line fields */
+/** Resolve set entries from an exercise. Returns category-specific defaults when setEntries is empty. */
 export const getSetEntries = (exercise: ExerciseEntry): SetEntry[] => {
   if (exercise.setEntries && exercise.setEntries.length > 0) return exercise.setEntries;
-  if (exercise.category === 'cardio') return [{ duration: 30, intensityZone: 2 }];
-  if (exercise.category === 'flexibility') return [{ duration: 30 }];
-  if (exercise.category === 'other') return [];
-  return [{ weightValue: exercise.weightValue, weightType: exercise.weightType || 'a', reps: exercise.reps || 1, sets: exercise.sets || 1 }];
+  if (exercise.category === EXERCISE_CATEGORY.CARDIO) return [{ duration: 30, intensityZone: 2 }];
+  if (exercise.category === EXERCISE_CATEGORY.FLEXIBILITY) return [{ duration: 30 }];
+  if (exercise.category === EXERCISE_CATEGORY.OTHER) return [];
+  return [{ weightValue: 0, weightType: 'a', reps: 10, sets: 3 }];
 };
 
 /** Format a single set entry as compact notation */
-export const formatSetNotation = (entry: SetEntry, category?: string): string => {
-  if (category === 'cardio') {
+export const formatSetNotation = (entry: SetEntry, category?: ExerciseCategory): string => {
+  if (category === EXERCISE_CATEGORY.CARDIO) {
     const zone = entry.intensityZone ? `Z${entry.intensityZone}` : '';
     return `${entry.duration || 0}min${zone ? ` · ${zone}` : ''}`;
   }
-  if (category === 'flexibility') return `${entry.duration || 0}min`;
+  if (category === EXERCISE_CATEGORY.FLEXIBILITY) return `${entry.duration || 0}min`;
   if (entry.weightType === 'bw') return `bw × ${entry.reps} × ${entry.sets}`;
   return `${entry.weightValue || 0}${entry.weightType || 'a'} × ${entry.reps} × ${entry.sets}`;
 };
 
 /** Build a notation summary for an exercise (returns empty string for "other") */
 export const buildNotationSummary = (exercise: ExerciseEntry): string => {
-  if (exercise.category === 'other') return exercise.notes || '';
+  if (exercise.category === EXERCISE_CATEGORY.OTHER) return exercise.notes || '';
   const entries = getSetEntries(exercise);
   return entries.map((e) => formatSetNotation(e, exercise.category)).join(' · ');
 };
 
-/** Normalize an exercise before saving — sets legacy fields from first setEntry for backward compat */
+/** Normalize an exercise before saving — strip client-only fields, ensure setEntries format. */
 export const normalizeExerciseForSave = (exercise: ExerciseEntry): ExerciseEntry => {
   const entries = getSetEntries(exercise);
-  const first = entries[0];
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { _dragId, ...rest } = exercise;
 
-  if (exercise.category === 'cardio' || exercise.category === 'flexibility' || exercise.category === 'other') {
+  if (exercise.category && DURATION_BASED_CATEGORIES.includes(exercise.category)) {
     return { ...rest, setEntries: entries.length > 0 ? entries : undefined };
   }
 
-  if (!first) return { ...rest, setEntries: entries };
-
-  return {
-    ...rest,
-    weightValue: first.weightValue,
-    weightType: first.weightType,
-    reps: first.reps,
-    sets: first.sets,
-    setEntries: entries,
-  };
+  return { ...rest, setEntries: entries };
 };
 
 export interface Workout {
@@ -224,7 +240,7 @@ export interface Workout {
   date: string;
   title?: string;
   notes?: string;
-  visibility: 'private' | 'shared';
+  visibility: Visibility;
   exercises: ExerciseEntry[];
   totalVolume: number; // Backend always provides (default 0)
   duration?: number;
@@ -233,80 +249,81 @@ export interface Workout {
   updatedAt?: string;
 }
 
-// Authentication
-export const register = async (data: RegisterData) => {
-  const response = await api.post('/auth/register', data);
-  return response.data;
-};
+// -----------------------------------------------------------------------------
+// API — Authentication
+// -----------------------------------------------------------------------------
 
-export const login = async (data: LoginData) => {
-  const response = await api.post('/auth/login', data);
-  return response.data;
-};
+export const register = (data: RegisterData) => request.post('/auth/register', data);
 
-export const verifyAuth = async () => {
-  const response = await api.get('/auth/verify');
-  return response.data;
-};
+export const login = (data: LoginData) => request.post('/auth/login', data);
 
-// Workouts
-export const createWorkout = async (workout: Workout) => {
-  const response = await api.post('/workouts', workout);
-  return response.data;
-};
+export const verifyAuth = () => request.get('/auth/verify');
 
-export const getWorkouts = async (page = 1, limit = 20) => {
-  const response = await api.get('/workouts', { params: { page, limit } });
-  return response.data;
-};
+// -----------------------------------------------------------------------------
+// API — Workouts
+// -----------------------------------------------------------------------------
 
-export const getWorkoutById = async (workoutId: string) => {
-  const response = await api.get(`/workouts/${workoutId}`);
-  return response.data;
-};
+export const createWorkout = (workout: Workout) => request.post('/workouts', workout);
 
-export const updateWorkout = async (workoutId: string, workout: Partial<Workout>) => {
-  const response = await api.put(`/workouts/${workoutId}`, workout);
-  return response.data;
-};
+export const getWorkouts = (page = 1, limit = 20) =>
+  request.get('/workouts', { params: { page, limit } });
 
-export const deleteWorkout = async (workoutId: string) => {
-  const response = await api.delete(`/workouts/${workoutId}`);
-  return response.data;
-};
+export const getWorkoutById = (workoutId: string) => request.get(`/workouts/${workoutId}`);
 
-export const getExerciseHistory = async (exerciseId: string) => {
-  const response = await api.get(`/workouts/exercise/${exerciseId}/history`);
-  return response.data;
-};
+export const updateWorkout = (workoutId: string, workout: Partial<Workout>) =>
+  request.put(`/workouts/${workoutId}`, workout);
 
-// Exercises
-export const getExercises = async (params?: { search?: string; category?: string; muscleGroup?: string }) => {
-  const response = await api.get('/exercises', { params });
-  return response.data;
-};
+export const deleteWorkout = (workoutId: string) => request.delete(`/workouts/${workoutId}`);
 
-export const createExercise = async (exercise: { name: string; muscleGroups?: string[]; description?: string; category?: string }) => {
-  const response = await api.post('/exercises', exercise);
-  return response.data;
-};
+export const getExerciseHistory = (exerciseId: string) =>
+  request.get(`/workouts/exercise/${exerciseId}/history`);
 
-export const getExerciseById = async (exerciseId: string) => {
-  const response = await api.get(`/exercises/${exerciseId}`);
-  return response.data;
-};
+// -----------------------------------------------------------------------------
+// API — Exercises
+// -----------------------------------------------------------------------------
 
-export const updateExercise = async (exerciseId: string, data: { name?: string; muscleGroups?: string[]; description?: string; category?: string }) => {
-  const response = await api.put(`/exercises/${exerciseId}`, data);
-  return response.data;
-};
+/** Optional server-side filters. When omitted, returns all exercises (filter client-side if needed). */
+export interface GetExercisesParams {
+  search?: string;
+  category?: ExerciseCategory;
+  muscleGroup?: MuscleGroup;
+}
 
-export const deleteExercise = async (exerciseId: string) => {
-  const response = await api.delete(`/exercises/${exerciseId}`);
-  return response.data;
-};
+export const getExercises = (params?: GetExercisesParams) =>
+  request.get('/exercises', { params: params ?? {} });
 
-// Analytics
+export const createExercise = (exercise: {
+  name: string;
+  primaryMuscleGroups?: MuscleGroup[];
+  secondaryMuscleGroups?: MuscleGroup[];
+  description?: string;
+  category: ExerciseCategory;
+}) => request.post('/exercises', exercise);
+
+export const getExerciseById = (exerciseId: string) => request.get(`/exercises/${exerciseId}`);
+
+export const updateExercise = (
+  exerciseId: string,
+  data: {
+    name?: string;
+    primaryMuscleGroups?: MuscleGroup[];
+    secondaryMuscleGroups?: MuscleGroup[];
+    description?: string;
+    category?: ExerciseCategory;
+  }
+) => request.put(`/exercises/${exerciseId}`, data);
+
+export const deleteExercise = (exerciseId: string) => request.delete(`/exercises/${exerciseId}`);
+
+// -----------------------------------------------------------------------------
+// API — Analytics
+// -----------------------------------------------------------------------------
+export interface VolumeContribution {
+  exerciseName: string;
+  amount: number;
+  weight: number; // 1 = primary, 0.5 = secondary
+}
+
 export interface BodyPartVolumeSets {
   name: string;
   unit: 'sets';
@@ -314,6 +331,7 @@ export interface BodyPartVolumeSets {
   targetSets: number;
   daysSinceLastTrained: number | null;
   lastTrainedDate: string | null;
+  contributions?: VolumeContribution[];
 }
 
 export interface BodyPartVolumeMinutes {
@@ -323,6 +341,7 @@ export interface BodyPartVolumeMinutes {
   targetMinutes: number;
   daysSinceLastTrained: number | null;
   lastTrainedDate: string | null;
+  contributions?: VolumeContribution[];
 }
 
 export type BodyPartVolume = BodyPartVolumeSets | BodyPartVolumeMinutes;
@@ -332,21 +351,16 @@ export interface VolumeSummaryResponse {
   targetSetsPerWeek: number;
 }
 
-export const getVolumeSummary = async (): Promise<VolumeSummaryResponse> => {
-  const response = await api.get('/analytics/volume-summary');
-  return response.data;
-};
+export const getVolumeSummary = (): Promise<VolumeSummaryResponse> =>
+  request.get('/analytics/volume-summary');
 
-// Profile
-export const getProfile = async () => {
-  const response = await api.get('/profile');
-  return response.data;
-};
+// -----------------------------------------------------------------------------
+// API — Profile
+// -----------------------------------------------------------------------------
 
-export const updateProfile = async (data: ProfileUpdateData) => {
-  const response = await api.put('/profile', data);
-  return response.data;
-};
+export const getProfile = () => request.get('/profile');
+
+export const updateProfile = (data: ProfileUpdateData) => request.put('/profile', data);
 
 export default api;
 

@@ -39,6 +39,7 @@ export const register = async (req: Request, res: Response): Promise<void> => {
         units: user.units,
         totalWorkouts: user.totalWorkouts,
         currentStreak: user.currentStreak,
+        isAdmin: user.isAdmin,
       },
     });
   } catch (error) {
@@ -73,6 +74,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
         units: user.units,
         totalWorkouts: user.totalWorkouts,
         currentStreak: user.currentStreak,
+        isAdmin: user.isAdmin,
       },
     });
   } catch (error) {

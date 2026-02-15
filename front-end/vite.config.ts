@@ -7,7 +7,7 @@ export default defineConfig({
   plugins: [
     react(),
     VitePWA({
-      registerType: 'prompt',
+      registerType: 'autoUpdate',
       includeAssets: ['icon-192.svg', 'icon-512.svg', 'apple-touch-icon.svg'],
       manifest: {
         name: 'KinFit - Track Your Fitness Journey',
@@ -41,8 +41,7 @@ export default defineConfig({
         ],
       },
       workbox: {
-        // Don't skip waiting - let user choose when to update
-        skipWaiting: false,
+        skipWaiting: true,
         clientsClaim: true,
         // Cache strategies for different resource types
         runtimeCaching: [

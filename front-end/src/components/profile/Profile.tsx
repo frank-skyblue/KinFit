@@ -1,8 +1,18 @@
-import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { getProfile, updateProfile, User, ProfileUpdateData } from '../../services/api';
-import { USER_KEY } from '../../constants/auth';
-import Layout from '../dashboard/Layout';
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import {
+  getProfile,
+  updateProfile,
+  User,
+  ProfileUpdateData,
+} from "../../services/api";
+import { USER_KEY } from "../../constants/auth";
+import {
+  GENDER_OPTIONS,
+  ACTIVITY_LEVEL_OPTIONS,
+  UNITS_OPTIONS,
+} from "../../constants/options";
+import Layout from "../dashboard/Layout";
 
 const calculateAge = (birthdate: string | undefined | null): number | null => {
   if (!birthdate) return null;
@@ -21,16 +31,16 @@ const Profile = () => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
-  const [error, setError] = useState('');
-  const [successMessage, setSuccessMessage] = useState('');
+  const [error, setError] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
 
   // Form state
   const [formData, setFormData] = useState<ProfileUpdateData>({
-    displayName: '',
-    bio: '',
-    fitnessGoals: '',
-    units: 'lbs',
-    birthdate: '',
+    displayName: "",
+    bio: "",
+    fitnessGoals: "",
+    units: "lbs",
+    birthdate: "",
     gender: null,
     height: null,
     weight: null,
@@ -40,22 +50,24 @@ const Profile = () => {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const response = await getProfile();
+        const response = (await getProfile()) as { user: User };
         setUser(response.user);
         setFormData({
-          displayName: response.user.displayName || '',
-          bio: response.user.bio || '',
-          fitnessGoals: response.user.fitnessGoals || '',
-          units: response.user.units || 'lbs',
-          birthdate: response.user.birthdate ? response.user.birthdate.split('T')[0] : '',
+          displayName: response.user.displayName || "",
+          bio: response.user.bio || "",
+          fitnessGoals: response.user.fitnessGoals || "",
+          units: response.user.units || "lbs",
+          birthdate: response.user.birthdate
+            ? response.user.birthdate.split("T")[0]
+            : "",
           gender: response.user.gender || null,
           height: response.user.height || null,
           weight: response.user.weight || null,
           activityLevel: response.user.activityLevel || null,
         });
       } catch (err) {
-        console.error('Failed to fetch profile:', err);
-        setError('Failed to load profile');
+        console.error("Failed to fetch profile:", err);
+        setError("Failed to load profile");
       } finally {
         setIsLoading(false);
       }
@@ -65,19 +77,21 @@ const Profile = () => {
   }, []);
 
   const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >,
   ) => {
     const { name, value, type } = e.target;
 
-    if (type === 'number') {
+    if (type === "number") {
       setFormData((prev) => ({
         ...prev,
-        [name]: value === '' ? null : parseFloat(value),
+        [name]: value === "" ? null : parseFloat(value),
       }));
     } else {
       setFormData((prev) => ({
         ...prev,
-        [name]: value === '' ? null : value,
+        [name]: value === "" ? null : value,
       }));
     }
   };
@@ -85,25 +99,28 @@ const Profile = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSaving(true);
-    setError('');
-    setSuccessMessage('');
+    setError("");
+    setSuccessMessage("");
 
     try {
       const response = await updateProfile(formData);
-      setUser(response.user);
-      setSuccessMessage('Profile updated successfully!');
+      setUser((response as { user: User }).user);
+      setSuccessMessage("Profile updated successfully!");
 
       // Update localStorage user data
       const storedUser = localStorage.getItem(USER_KEY);
       if (storedUser) {
-        const updatedUser = { ...JSON.parse(storedUser), ...response.user };
+        const updatedUser = {
+          ...JSON.parse(storedUser),
+          ...(response as { user: User }).user,
+        };
         localStorage.setItem(USER_KEY, JSON.stringify(updatedUser));
       }
 
-      setTimeout(() => setSuccessMessage(''), 3000);
+      setTimeout(() => setSuccessMessage(""), 3000);
     } catch (err) {
-      console.error('Failed to update profile:', err);
-      setError('Failed to update profile. Please try again.');
+      console.error("Failed to update profile:", err);
+      setError("Failed to update profile. Please try again.");
     } finally {
       setIsSaving(false);
     }
@@ -154,12 +171,24 @@ const Profile = () => {
               className="text-kin-stone-500 hover:text-kin-navy transition mb-2 flex items-center gap-1"
               aria-label="Go back"
             >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              <svg
+                className="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M15 19l-7-7 7-7"
+                />
               </svg>
               Back
             </button>
-            <h1 className="text-3xl font-bold font-montserrat text-kin-navy">Profile</h1>
+            <h1 className="text-3xl font-bold font-montserrat text-kin-navy">
+              Profile
+            </h1>
           </div>
         </div>
 
@@ -214,7 +243,10 @@ const Profile = () => {
             </h2>
             <div className="space-y-4">
               <div>
-                <label htmlFor="displayName" className="block text-sm font-medium text-kin-stone-600 mb-1">
+                <label
+                  htmlFor="displayName"
+                  className="block text-sm font-medium text-kin-stone-600 mb-1"
+                >
                   Display Name *
                 </label>
                 <input
@@ -230,50 +262,61 @@ const Profile = () => {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label htmlFor="birthdate" className="block text-sm font-medium text-kin-stone-600 mb-1">
+                  <label
+                    htmlFor="birthdate"
+                    className="block text-sm font-medium text-kin-stone-600 mb-1"
+                  >
                     Birth Date
                   </label>
                   <input
                     type="date"
                     id="birthdate"
                     name="birthdate"
-                    value={formData.birthdate || ''}
+                    value={formData.birthdate || ""}
                     onChange={handleInputChange}
                     className="w-full px-3 py-2 border border-kin-stone-300 rounded-kin-sm focus:ring-2 focus:ring-kin-coral outline-none"
                   />
                   {age !== null && (
-                    <p className="text-sm text-kin-stone-500 mt-1">Age: {age} years</p>
+                    <p className="text-sm text-kin-stone-500 mt-1">
+                      Age: {age} years
+                    </p>
                   )}
                 </div>
 
                 <div>
-                  <label htmlFor="gender" className="block text-sm font-medium text-kin-stone-600 mb-1">
+                  <label
+                    htmlFor="gender"
+                    className="block text-sm font-medium text-kin-stone-600 mb-1"
+                  >
                     Gender
                   </label>
                   <select
                     id="gender"
                     name="gender"
-                    value={formData.gender || ''}
+                    value={formData.gender || ""}
                     onChange={handleInputChange}
                     className="w-full px-3 py-2 border border-kin-stone-300 rounded-kin-sm focus:ring-2 focus:ring-kin-coral outline-none"
                   >
-                    <option value="">Select...</option>
-                    <option value="male">Male</option>
-                    <option value="female">Female</option>
-                    <option value="other">Other</option>
-                    <option value="prefer_not_to_say">Prefer not to say</option>
+                    {GENDER_OPTIONS.map((opt) => (
+                      <option key={opt.value} value={opt.value}>
+                        {opt.label}
+                      </option>
+                    ))}
                   </select>
                 </div>
               </div>
 
               <div>
-                <label htmlFor="bio" className="block text-sm font-medium text-kin-stone-600 mb-1">
+                <label
+                  htmlFor="bio"
+                  className="block text-sm font-medium text-kin-stone-600 mb-1"
+                >
                   Bio
                 </label>
                 <textarea
                   id="bio"
                   name="bio"
-                  value={formData.bio || ''}
+                  value={formData.bio || ""}
                   onChange={handleInputChange}
                   rows={3}
                   maxLength={500}
@@ -281,7 +324,7 @@ const Profile = () => {
                   className="w-full px-3 py-2 border border-kin-stone-300 rounded-kin-sm focus:ring-2 focus:ring-kin-coral outline-none resize-none"
                 />
                 <p className="text-xs text-kin-stone-400 mt-1">
-                  {(formData.bio || '').length}/500 characters
+                  {(formData.bio || "").length}/500 characters
                 </p>
               </div>
             </div>
@@ -294,14 +337,17 @@ const Profile = () => {
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
-                <label htmlFor="height" className="block text-sm font-medium text-kin-stone-600 mb-1">
+                <label
+                  htmlFor="height"
+                  className="block text-sm font-medium text-kin-stone-600 mb-1"
+                >
                   Height (cm)
                 </label>
                 <input
                   type="number"
                   id="height"
                   name="height"
-                  value={formData.height ?? ''}
+                  value={formData.height ?? ""}
                   onChange={handleInputChange}
                   min={0}
                   max={300}
@@ -311,25 +357,31 @@ const Profile = () => {
               </div>
 
               <div>
-                <label htmlFor="weight" className="block text-sm font-medium text-kin-stone-600 mb-1">
+                <label
+                  htmlFor="weight"
+                  className="block text-sm font-medium text-kin-stone-600 mb-1"
+                >
                   Weight ({formData.units})
                 </label>
                 <input
                   type="number"
                   id="weight"
                   name="weight"
-                  value={formData.weight ?? ''}
+                  value={formData.weight ?? ""}
                   onChange={handleInputChange}
                   min={0}
                   max={1000}
                   step={0.1}
-                  placeholder={formData.units === 'lbs' ? '165' : '75'}
+                  placeholder={formData.units === "lbs" ? "165" : "75"}
                   className="w-full px-3 py-2 border border-kin-stone-300 rounded-kin-sm focus:ring-2 focus:ring-kin-coral outline-none"
                 />
               </div>
 
               <div>
-                <label htmlFor="units" className="block text-sm font-medium text-kin-stone-600 mb-1">
+                <label
+                  htmlFor="units"
+                  className="block text-sm font-medium text-kin-stone-600 mb-1"
+                >
                   Weight Units
                 </label>
                 <select
@@ -339,8 +391,11 @@ const Profile = () => {
                   onChange={handleInputChange}
                   className="w-full px-3 py-2 border border-kin-stone-300 rounded-kin-sm focus:ring-2 focus:ring-kin-coral outline-none"
                 >
-                  <option value="lbs">Pounds (lbs)</option>
-                  <option value="kg">Kilograms (kg)</option>
+                  {UNITS_OPTIONS.map((opt) => (
+                    <option key={opt.value} value={opt.value}>
+                      {opt.label}
+                    </option>
+                  ))}
                 </select>
               </div>
             </div>
@@ -353,33 +408,38 @@ const Profile = () => {
             </h2>
             <div className="space-y-4">
               <div>
-                <label htmlFor="activityLevel" className="block text-sm font-medium text-kin-stone-600 mb-1">
+                <label
+                  htmlFor="activityLevel"
+                  className="block text-sm font-medium text-kin-stone-600 mb-1"
+                >
                   Activity Level
                 </label>
                 <select
                   id="activityLevel"
                   name="activityLevel"
-                  value={formData.activityLevel || ''}
+                  value={formData.activityLevel || ""}
                   onChange={handleInputChange}
                   className="w-full px-3 py-2 border border-kin-stone-300 rounded-kin-sm focus:ring-2 focus:ring-kin-coral outline-none"
                 >
-                  <option value="">Select...</option>
-                  <option value="sedentary">Sedentary (little or no exercise)</option>
-                  <option value="light">Light (1-3 days/week)</option>
-                  <option value="moderate">Moderate (3-5 days/week)</option>
-                  <option value="active">Active (6-7 days/week)</option>
-                  <option value="very_active">Very Active (2x per day)</option>
+                  {ACTIVITY_LEVEL_OPTIONS.map((opt) => (
+                    <option key={opt.value} value={opt.value}>
+                      {opt.label}
+                    </option>
+                  ))}
                 </select>
               </div>
 
               <div>
-                <label htmlFor="fitnessGoals" className="block text-sm font-medium text-kin-stone-600 mb-1">
+                <label
+                  htmlFor="fitnessGoals"
+                  className="block text-sm font-medium text-kin-stone-600 mb-1"
+                >
                   Fitness Goals
                 </label>
                 <textarea
                   id="fitnessGoals"
                   name="fitnessGoals"
-                  value={formData.fitnessGoals || ''}
+                  value={formData.fitnessGoals || ""}
                   onChange={handleInputChange}
                   rows={3}
                   maxLength={500}
@@ -387,7 +447,7 @@ const Profile = () => {
                   className="w-full px-3 py-2 border border-kin-stone-300 rounded-kin-sm focus:ring-2 focus:ring-kin-coral outline-none resize-none"
                 />
                 <p className="text-xs text-kin-stone-400 mt-1">
-                  {(formData.fitnessGoals || '').length}/500 characters
+                  {(formData.fitnessGoals || "").length}/500 characters
                 </p>
               </div>
             </div>
@@ -414,7 +474,11 @@ const Profile = () => {
             </div>
             {user.createdAt && (
               <p className="text-sm text-kin-stone-500 mt-4 text-center">
-                Member since {new Date(user.createdAt).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+                Member since{" "}
+                {new Date(user.createdAt).toLocaleDateString("en-US", {
+                  month: "long",
+                  year: "numeric",
+                })}
               </p>
             )}
           </div>
@@ -426,7 +490,7 @@ const Profile = () => {
               disabled={isSaving}
               className="px-6 py-3 bg-kin-teal text-white font-semibold font-montserrat rounded-kin-sm hover:bg-kin-teal-600 shadow-kin-soft hover:shadow-kin-medium transition disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {isSaving ? 'Saving...' : 'Save Changes'}
+              {isSaving ? "Saving..." : "Save Changes"}
             </button>
           </div>
         </form>

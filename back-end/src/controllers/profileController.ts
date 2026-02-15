@@ -31,6 +31,7 @@ export const getProfile = async (req: AuthRequest, res: Response): Promise<void>
         totalWorkouts: user.totalWorkouts,
         currentStreak: user.currentStreak,
         settings: user.settings,
+        isAdmin: user.isAdmin,
         createdAt: user.createdAt,
       },
     });
@@ -99,6 +100,7 @@ export const updateProfile = async (req: AuthRequest, res: Response): Promise<vo
         totalWorkouts: user.totalWorkouts,
         currentStreak: user.currentStreak,
         settings: user.settings,
+        isAdmin: user.isAdmin,
         createdAt: user.createdAt,
       },
     });

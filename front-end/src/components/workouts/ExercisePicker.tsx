@@ -16,7 +16,7 @@ const ExercisePicker = ({ exercises, isLoading, onSelect, onClose }: ExercisePic
 
   const filtered = useFuzzySearch({
     items: exercises,
-    keys: ['name', 'muscleGroups'],
+    keys: ['name', 'primaryMuscleGroups', 'secondaryMuscleGroups'],
     searchTerm,
   });
 
@@ -125,7 +125,9 @@ const ExercisePicker = ({ exercises, isLoading, onSelect, onClose }: ExercisePic
               aria-label={`Add ${exercise.name} to workout`}
             >
               <p className="font-semibold font-inter text-kin-navy">{exercise.name}</p>
-              <p className="text-sm text-kin-teal font-inter">{exercise.muscleGroups.join(', ')}</p>
+              <p className="text-sm text-kin-teal font-inter">
+                {[...(exercise.primaryMuscleGroups ?? []), ...(exercise.secondaryMuscleGroups ?? [])].join(', ')}
+              </p>
             </button>
           ))
         )}

@@ -56,7 +56,8 @@ const seedExercises = async (
         } else {
             const newExercise = await Exercise.create({
                 name: exercise.name,
-                muscleGroups: exercise.muscleGroups,
+                primaryMuscleGroups: exercise.muscleGroups,
+                secondaryMuscleGroups: [],
                 category: exercise.category,
                 isCustom: false,
             });
