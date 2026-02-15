@@ -23,7 +23,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const skip = (page - 1) * limit;
 
       const workouts = await Workout.find({ userId: new mongoose.Types.ObjectId(user.userId) })
-        .sort({ date: -1 })
+        .sort({ date: -1, createdAt: -1 })
         .skip(skip)
         .limit(limit);
 

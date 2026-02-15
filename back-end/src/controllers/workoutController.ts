@@ -62,7 +62,7 @@ export const getWorkouts = async (req: AuthRequest, res: Response): Promise<void
     const skip = (page - 1) * limit;
 
     const workouts = await Workout.find({ userId: new mongoose.Types.ObjectId(userId) })
-      .sort({ date: -1 })
+      .sort({ date: -1, createdAt: -1 })
       .skip(skip)
       .limit(limit)
       .populate('exercises.exerciseId', 'name');

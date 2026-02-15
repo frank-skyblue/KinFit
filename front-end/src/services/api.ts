@@ -306,6 +306,25 @@ export const deleteExercise = async (exerciseId: string) => {
   return response.data;
 };
 
+// Analytics
+export interface BodyPartVolume {
+  name: string;
+  setsThisWeek: number;
+  targetSets: number;
+  daysSinceLastTrained: number | null;
+  lastTrainedDate: string | null;
+}
+
+export interface VolumeSummaryResponse {
+  bodyParts: BodyPartVolume[];
+  targetSetsPerWeek: number;
+}
+
+export const getVolumeSummary = async (): Promise<VolumeSummaryResponse> => {
+  const response = await api.get('/analytics/volume-summary');
+  return response.data;
+};
+
 // Profile
 export const getProfile = async () => {
   const response = await api.get('/profile');

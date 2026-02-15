@@ -8,6 +8,7 @@ import authRoutes from './routes/authRoutes';
 import workoutRoutes from './routes/workoutRoutes';
 import exerciseRoutes from './routes/exerciseRoutes';
 import profileRoutes from './routes/profileRoutes';
+import analyticsRoutes from './routes/analyticsRoutes';
 
 // Load environment variables
 const PORT = process.env.PORT || 5001;
@@ -31,6 +32,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/workouts', workoutRoutes);
 app.use('/api/exercises', exerciseRoutes);
 app.use('/api/profile', profileRoutes);
+app.use('/api/analytics', analyticsRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req: Request, res: Response) => {

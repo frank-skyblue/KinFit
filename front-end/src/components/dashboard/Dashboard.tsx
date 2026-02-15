@@ -5,6 +5,7 @@ import { getWorkouts, Workout } from '../../services/api';
 import { formatDateShort } from '../../utils/date';
 import Layout from './Layout';
 import LoadingSpinner from '../common/LoadingSpinner';
+import VolumeSummary from './VolumeSummary';
 
 const Dashboard = () => {
   const { user } = useAuth();
@@ -46,26 +47,6 @@ const Dashboard = () => {
           </Link>
         </div>
 
-        {/* Quick Actions - Prominent */}
-        <div className="grid grid-cols-2 gap-3">
-          <Link
-            to="/workouts/new"
-            className="bg-white p-4 rounded-kin-lg shadow-kin-soft border-2 border-kin-coral-200 hover:bg-kin-coral-50 transition text-center"
-            aria-label="Log a workout"
-          >
-            <span className="text-2xl block mb-1">💪</span>
-            <h3 className="font-semibold font-montserrat text-kin-navy text-sm">Log Workout</h3>
-          </Link>
-          <Link
-            to="/exercises"
-            className="bg-white p-4 rounded-kin-lg shadow-kin-soft border-2 border-kin-teal-200 hover:bg-kin-teal-50 transition text-center"
-            aria-label="Browse exercises"
-          >
-            <span className="text-2xl block mb-1">🏋️</span>
-            <h3 className="font-semibold font-montserrat text-kin-navy text-sm">Exercises</h3>
-          </Link>
-        </div>
-
         {/* Stats Row - Condensed */}
         <div className="bg-white rounded-kin-lg shadow-kin-soft p-3">
           <div className="flex items-center justify-around text-center">
@@ -91,6 +72,9 @@ const Dashboard = () => {
             </div>
           </div>
         </div>
+
+        {/* Weekly Volume Tracker */}
+        <VolumeSummary />
 
         {/* Recent Workouts - Compact */}
         <div className="bg-white rounded-kin-lg shadow-kin-soft p-4">
