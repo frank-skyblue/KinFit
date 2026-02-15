@@ -84,7 +84,7 @@ const FormInput = ({ label, size = 'default', id, className, type, min, max, ste
       if (!isNaN(numMin)) newValue = Math.max(numMin, newValue);
       if (!isNaN(numMax)) newValue = Math.min(numMax, newValue);
 
-      cb?.({ target: { value: String(newValue) } } as React.ChangeEvent<HTMLInputElement>);
+      if (cb) cb({ target: { value: String(newValue) } } as React.ChangeEvent<HTMLInputElement>);
     };
 
     const handleTouchEnd = () => {

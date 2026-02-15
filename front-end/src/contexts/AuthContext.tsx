@@ -1,5 +1,7 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { User, login as apiLogin, register as apiRegister, verifyAuth } from '../services/api';
+import { AUTH_TOKEN_KEY, USER_KEY } from '../constants/auth';
+import { getApiErrorMessage } from '../utils/errors';
 
 interface AuthContextType {
   user: User | null;
@@ -30,8 +32,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   useEffect(() => {
     const initAuth = async () => {
-      const token = localStorage.getItem('authToken');
-      const savedUser = localStorage.getItem('user');
+      const token = localStorage.getItem(AUTH_TOKEN_KEY);
+      const savedUser = localStorage.getItem(USER_KEY);
 
       if (token && savedUser) {
         try {
@@ -39,8 +41,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
           setUser(JSON.parse(savedUser));
         } catch (error) {
           console.error('Token verification failed:', error);
-          localStorage.removeItem('authToken');
-          localStorage.removeItem('user');
+          localStorage.removeItem(AUTH_TOKEN_KEY);
+          localStorage.removeItem(USER_KEY);
         }
       }
       setIsLoading(false);
@@ -54,11 +56,11 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       const response = await apiLogin({ email, password });
       const { token, user: userData } = response;
 
-      localStorage.setItem('authToken', token);
-      localStorage.setItem('user', JSON.stringify(userData));
+      localStorage.setItem(AUTH_TOKEN_KEY, token);
+      localStorage.setItem(USER_KEY, JSON.stringify(userData));
       setUser(userData);
-    } catch (error: any) {
-      throw new Error(error.response?.data?.error || 'Login failed');
+    } catch (err: unknown) {
+      throw new Error(getApiErrorMessage(err) || 'Login failed');
     }
   };
 
@@ -67,17 +69,17 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       const response = await apiRegister({ username, email, password, displayName });
       const { token, user: userData } = response;
 
-      localStorage.setItem('authToken', token);
-      localStorage.setItem('user', JSON.stringify(userData));
+      localStorage.setItem(AUTH_TOKEN_KEY, token);
+      localStorage.setItem(USER_KEY, JSON.stringify(userData));
       setUser(userData);
-    } catch (error: any) {
-      throw new Error(error.response?.data?.error || 'Registration failed');
+    } catch (err: unknown) {
+      throw new Error(getApiErrorMessage(err) || 'Registration failed');
     }
   };
 
   const logout = () => {
-    localStorage.removeItem('authToken');
-    localStorage.removeItem('user');
+    localStorage.removeItem(AUTH_TOKEN_KEY);
+    localStorage.removeItem(USER_KEY);
     setUser(null);
     window.location.href = '/login';
   };

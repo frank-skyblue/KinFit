@@ -3,19 +3,20 @@ import bcrypt from 'bcryptjs';
 import { cors } from '../_lib/cors';
 import connectDB from '../_lib/db';
 import { generateToken } from '../_lib/auth';
+import { sendError } from '../_lib/errorResponse';
 import User from '../_lib/models/User';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (cors(req, res)) return;
 
   if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
+    return sendError(res, 405, 'Method not allowed');
   }
 
   const { email, password } = req.body;
 
   if (!email || !password) {
-    return res.status(400).json({ error: 'Email and password are required' });
+    return sendError(res, 400, 'Email and password are required');
   }
 
   try {
@@ -24,13 +25,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const user = await User.findOne({ email: email.toLowerCase() });
 
     if (!user) {
-      return res.status(401).json({ error: 'Invalid email or password' });
+      return sendError(res, 401, 'Invalid email or password');
     }
 
     const isValidPassword = await bcrypt.compare(password, user.password);
 
     if (!isValidPassword) {
-      return res.status(401).json({ error: 'Invalid email or password' });
+      return sendError(res, 401, 'Invalid email or password');
     }
 
     const token = generateToken({
@@ -55,6 +56,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     });
   } catch (error) {
     console.error('Login error:', error);
-    res.status(500).json({ error: 'Login failed' });
+    return sendError(res, 500, 'Login failed');
   }
 }

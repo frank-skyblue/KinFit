@@ -11,7 +11,7 @@ interface WorkoutSummaryProps {
 
 const WorkoutSummary = ({ workout, units, isEditing, editData, onEditDataChange }: WorkoutSummaryProps) => {
   const exerciseCount = isEditing && editData ? editData.exercises.length : workout.exercises.length;
-  const volume = workout.totalVolume?.toLocaleString() || '0';
+  const volume = workout.totalVolume.toLocaleString();
   const visibilityLabel = workout.visibility === 'shared' ? 'Shared' : 'Private';
   const visibilityIcon = workout.visibility === 'shared' ? '👥' : '🔒';
 

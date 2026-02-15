@@ -1,4 +1,5 @@
 import express, { Application, Request, Response } from 'express';
+import { sendError } from './utils/errorResponse';
 import cors from 'cors';
 import { connectDB } from './services/mongooseService';
 
@@ -38,13 +39,13 @@ app.get('/api/health', (req: Request, res: Response) => {
 
 // 404 handler
 app.use((req: Request, res: Response) => {
-  res.status(404).json({ error: 'Route not found' });
+  sendError(res, 404, 'Route not found');
 });
 
 // Error handler
 app.use((err: Error, req: Request, res: Response, next: any) => {
   console.error('Error:', err);
-  res.status(500).json({ error: 'Internal server error' });
+  sendError(res, 500, 'Internal server error');
 });
 
 // Connect to MongoDB and start server

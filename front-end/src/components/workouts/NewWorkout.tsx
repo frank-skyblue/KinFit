@@ -1,30 +1,23 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {
-  DndContext,
-  closestCenter,
-  PointerSensor,
-  TouchSensor,
-  useSensor,
-  useSensors,
-  DragEndEvent,
-} from '@dnd-kit/core';
+import { DndContext, closestCenter, DragEndEvent } from '@dnd-kit/core';
 import {
   SortableContext,
   verticalListSortingStrategy,
   arrayMove,
 } from '@dnd-kit/sortable';
 import Layout from '../dashboard/Layout';
+import ErrorAlert from '../common/ErrorAlert';
 import FormInput from '../common/FormInput';
 import FormTextarea from '../common/FormTextarea';
 import FormRadioGroup from '../common/FormRadioGroup';
 import ExercisePicker from './ExercisePicker';
 import SortableExerciseCard from './SortableExerciseCard';
-import { Exercise, ExerciseEntry, createWorkout, getExercises, normalizeExerciseForSave, uniqueId } from '../../services/api';
+import { Exercise, ExerciseEntry, createWorkout, createExerciseEntry, getExercises, normalizeExerciseForSave } from '../../services/api';
 import { useAuth } from '../../contexts/AuthContext';
+import { getApiErrorMessage } from '../../utils/errors';
+import { useWorkoutDnDSensors } from '../../hooks/useWorkoutDnDSensors';
 
-const getErrorMessage = (err: unknown): string | undefined =>
-  (err as { response?: { data?: { error?: string } } }).response?.data?.error;
 const VISIBILITY_OPTIONS = [
   { value: 'private', label: 'Private' },
   { value: 'shared', label: 'Shared with Partners' },
@@ -40,10 +33,7 @@ const NewWorkout = () => {
   const [error, setError] = useState('');
   const [isDragActive, setIsDragActive] = useState(false);
 
-  const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
-    useSensor(TouchSensor, { activationConstraint: { delay: 200, tolerance: 6 } }),
-  );
+  const sensors = useWorkoutDnDSensors();
 
   const [workoutData, setWorkoutData] = useState({
     date: new Date().toISOString().split('T')[0],
@@ -70,27 +60,7 @@ const NewWorkout = () => {
   }, []);
 
   const handleAddExercise = (exercise: Exercise) => {
-    const cat = exercise.category as ExerciseEntry['category'];
-    const defaultEntries =
-      cat === 'cardio'      ? [{ duration: 30, intensityZone: 2 }] :
-      cat === 'flexibility'  ? [{ duration: 30 }] :
-      cat === 'other'        ? [] :
-      /* strength */           [{ weightValue: 0, weightType: 'a' as const, reps: 10, sets: 3 }];
-    const isStrength = !cat || cat === 'strength';
-
-    const newExercise: ExerciseEntry = {
-      exerciseId: exercise._id,
-      exerciseName: exercise.name,
-      category: cat,
-      weightValue: isStrength ? 0 : undefined,
-      weightType: isStrength ? 'a' : undefined,
-      reps: isStrength ? 10 : undefined,
-      sets: isStrength ? 3 : undefined,
-      setEntries: defaultEntries.length > 0 ? defaultEntries : undefined,
-      notes: '',
-      orderIndex: workoutData.exercises.length,
-      _dragId: uniqueId(),
-    };
+    const newExercise = createExerciseEntry(exercise, workoutData.exercises.length);
     setWorkoutData({
       ...workoutData,
       exercises: [...workoutData.exercises, newExercise],
@@ -141,11 +111,12 @@ const NewWorkout = () => {
       const normalizedData = {
         ...workoutData,
         exercises: workoutData.exercises.map(normalizeExerciseForSave),
+        totalVolume: 0, // Backend computes from exercises
       };
       await createWorkout(normalizedData);
       navigate('/workouts');
     } catch (err: unknown) {
-      setError(getErrorMessage(err) || 'Failed to create workout');
+      setError(getApiErrorMessage(err) || 'Failed to create workout');
     } finally {
       setIsLoading(false);
     }
@@ -159,11 +130,7 @@ const NewWorkout = () => {
           <p className="text-kin-teal font-inter">Log your training session</p>
         </div>
 
-        {error && (
-          <div className="mb-6 p-4 bg-kin-coral-100 border border-kin-coral-300 rounded-kin-sm">
-            <p className="text-kin-coral-800 text-sm font-inter">{error}</p>
-          </div>
-        )}
+        {error && <ErrorAlert message={error} className="mb-6" />}
 
         <form onSubmit={handleSubmit}>
           {/* Workout Details */}
@@ -254,7 +221,7 @@ const NewWorkout = () => {
                         id={exercise._dragId!}
                         exercise={exercise}
                         index={index}
-                        units={user?.units || 'lbs'}
+                        units={user!.units}
                         onUpdate={handleUpdateExercise}
                         onRemove={handleRemoveExercise}
                         forceCollapsed={isDragActive}

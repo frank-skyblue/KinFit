@@ -2,6 +2,7 @@ import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { cors } from '../_lib/cors';
 import connectDB from '../_lib/db';
 import { authenticate } from '../_lib/auth';
+import { sendError } from '../_lib/errorResponse';
 import User from '../_lib/models/User';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
@@ -18,7 +19,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const userDoc = await User.findById(user.userId).select('-password');
 
       if (!userDoc) {
-        return res.status(404).json({ error: 'User not found' });
+        return sendError(res, 404, 'User not found');
       }
 
       res.json({
@@ -44,7 +45,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       });
     } catch (error) {
       console.error('Get profile error:', error);
-      res.status(500).json({ error: 'Failed to get profile' });
+      return sendError(res, 500, 'Failed to get profile');
     }
   } else if (req.method === 'PUT') {
     // Update current user's profile
@@ -83,7 +84,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       ).select('-password');
 
       if (!userDoc) {
-        return res.status(404).json({ error: 'User not found' });
+        return sendError(res, 404, 'User not found');
       }
 
       res.json({
@@ -110,9 +111,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       });
     } catch (error) {
       console.error('Update profile error:', error);
-      res.status(500).json({ error: 'Failed to update profile' });
+      return sendError(res, 500, 'Failed to update profile');
     }
   } else {
-    res.status(405).json({ error: 'Method not allowed' });
+    return sendError(res, 405, 'Method not allowed');
   }
 }

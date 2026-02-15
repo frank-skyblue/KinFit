@@ -2,6 +2,7 @@ import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { cors } from '../_lib/cors';
 import connectDB from '../_lib/db';
 import { authenticate } from '../_lib/auth';
+import { sendError } from '../_lib/errorResponse';
 import Exercise from '../_lib/models/Exercise';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
@@ -13,7 +14,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const { exerciseId } = req.query;
 
   if (!exerciseId || typeof exerciseId !== 'string') {
-    return res.status(400).json({ error: 'Exercise ID is required' });
+    return sendError(res, 400, 'Exercise ID is required');
   }
 
   await connectDB();
@@ -24,15 +25,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const exercise = await Exercise.findById(exerciseId);
 
       if (!exercise) {
-        return res.status(404).json({ error: 'Exercise not found' });
+        return sendError(res, 404, 'Exercise not found');
       }
 
       return res.status(200).json({ exercise });
     } catch (error) {
       console.error('Get exercise error:', error);
-      return res.status(500).json({ error: 'Failed to fetch exercise' });
+      return sendError(res, 500, 'Failed to fetch exercise');
     }
   }
 
-  return res.status(405).json({ error: 'Method not allowed' });
+  return sendError(res, 405, 'Method not allowed');
 }

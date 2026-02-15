@@ -1,5 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Exercise } from '../../services/api';
+import { getApiErrorMessage } from '../../utils/errors';
+import ErrorAlert from '../common/ErrorAlert';
 
 type ExerciseCategory = 'strength' | 'cardio' | 'flexibility' | 'other';
 
@@ -22,10 +24,12 @@ const ExerciseFormModal = ({ exercise, onSave, onClose }: ExerciseFormModalProps
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState('');
 
-  const [name, setName] = useState(exercise?.name || '');
-  const [muscleGroups, setMuscleGroups] = useState(exercise?.muscleGroups.join(', ') || '');
-  const [category, setCategory] = useState<ExerciseCategory>((exercise?.category as ExerciseCategory) || 'strength');
-  const [description, setDescription] = useState(exercise?.description || '');
+  const [name, setName] = useState(exercise ? exercise.name : '');
+  const [muscleGroups, setMuscleGroups] = useState(exercise ? exercise.muscleGroups.join(', ') : '');
+  const [category, setCategory] = useState<ExerciseCategory>(
+    (exercise ? exercise.category : 'strength') as ExerciseCategory
+  );
+  const [description, setDescription] = useState(exercise ? (exercise.description || '') : '');
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -47,11 +51,11 @@ const ExerciseFormModal = ({ exercise, onSave, onClose }: ExerciseFormModalProps
     const handleTouchMove = (e: TouchEvent) => {
       if (e.target === backdrop) e.preventDefault();
     };
-    backdrop?.addEventListener('touchmove', handleTouchMove, { passive: false });
+    if (backdrop) backdrop.addEventListener('touchmove', handleTouchMove, { passive: false });
 
     return () => {
       document.removeEventListener('keydown', handleKeyDown);
-      backdrop?.removeEventListener('touchmove', handleTouchMove);
+      if (backdrop) backdrop.removeEventListener('touchmove', handleTouchMove);
       html.style.overflow = '';
       html.style.position = '';
       html.style.top = '';
@@ -78,8 +82,7 @@ const ExerciseFormModal = ({ exercise, onSave, onClose }: ExerciseFormModalProps
         .filter(Boolean);
       await onSave({ name, muscleGroups: groups, category, description });
     } catch (err: unknown) {
-      const msg = (err as { response?: { data?: { error?: string } } }).response?.data?.error;
-      setError(msg || 'Something went wrong');
+      setError(getApiErrorMessage(err) || 'Something went wrong');
       setIsSaving(false);
     }
   };
@@ -114,11 +117,7 @@ const ExerciseFormModal = ({ exercise, onSave, onClose }: ExerciseFormModalProps
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="p-5 space-y-4">
-          {error && (
-            <div className="p-3 bg-kin-coral-100 border border-kin-coral-300 rounded-kin-sm">
-              <p className="text-kin-coral-800 text-sm font-inter">{error}</p>
-            </div>
-          )}
+          {error && <ErrorAlert message={error} className="p-3" />}
 
           <div>
             <label className="block text-sm font-medium font-inter text-kin-navy mb-1.5">

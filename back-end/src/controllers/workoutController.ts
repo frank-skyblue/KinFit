@@ -1,6 +1,7 @@
 import { Response } from 'express';
 import { AuthRequest } from '../middleware/authMiddleware';
 import Workout from '../models/Workout';
+import { sendError } from '../utils/errorResponse';
 import User from '../models/User';
 import mongoose from 'mongoose';
 
@@ -9,16 +10,14 @@ export const createWorkout = async (req: AuthRequest, res: Response): Promise<vo
     const userId = req.user?.userId;
 
     if (!userId) {
-      res.status(401).json({ error: 'User not authenticated' });
-      return;
+      return sendError(res, 401, 'User not authenticated');
     }
 
     const { date, title, notes, visibility, exercises, duration, tags } = req.body;
 
     // Validation
     if (!exercises || exercises.length === 0) {
-      res.status(400).json({ error: 'At least one exercise is required' });
-      return;
+      return sendError(res, 400, 'At least one exercise is required');
     }
 
     // Create workout
@@ -46,7 +45,7 @@ export const createWorkout = async (req: AuthRequest, res: Response): Promise<vo
     });
   } catch (error) {
     console.error('Create workout error:', error);
-    res.status(500).json({ error: 'Failed to create workout' });
+    return sendError(res, 500, 'Failed to create workout');
   }
 };
 
@@ -55,8 +54,7 @@ export const getWorkouts = async (req: AuthRequest, res: Response): Promise<void
     const userId = req.user?.userId;
 
     if (!userId) {
-      res.status(401).json({ error: 'User not authenticated' });
-      return;
+      return sendError(res, 401, 'User not authenticated');
     }
 
     const page = parseInt(req.query.page as string) || 1;
@@ -82,7 +80,7 @@ export const getWorkouts = async (req: AuthRequest, res: Response): Promise<void
     });
   } catch (error) {
     console.error('Get workouts error:', error);
-    res.status(500).json({ error: 'Failed to fetch workouts' });
+    return sendError(res, 500, 'Failed to fetch workouts');
   }
 };
 
@@ -92,27 +90,26 @@ export const getWorkoutById = async (req: AuthRequest, res: Response): Promise<v
     const { workoutId } = req.params;
 
     if (!userId) {
-      res.status(401).json({ error: 'User not authenticated' });
-      return;
+      return sendError(res, 401, 'User not authenticated');
     }
 
     const workout = await Workout.findById(workoutId).populate('exercises.exerciseId', 'name');
 
     if (!workout) {
-      res.status(404).json({ error: 'Workout not found' });
+      return sendError(res, 404, 'Workout not found');
       return;
     }
 
     // Check if user has access to this workout
     if (workout.userId.toString() !== userId && workout.visibility === 'private') {
-      res.status(403).json({ error: 'Access denied' });
+      return sendError(res, 403, 'Access denied');
       return;
     }
 
     res.status(200).json({ workout });
   } catch (error) {
     console.error('Get workout error:', error);
-    res.status(500).json({ error: 'Failed to fetch workout' });
+    return sendError(res, 500, 'Failed to fetch workout');
   }
 };
 
@@ -122,20 +119,19 @@ export const updateWorkout = async (req: AuthRequest, res: Response): Promise<vo
     const { workoutId } = req.params;
 
     if (!userId) {
-      res.status(401).json({ error: 'User not authenticated' });
-      return;
+      return sendError(res, 401, 'User not authenticated');
     }
 
     const workout = await Workout.findById(workoutId);
 
     if (!workout) {
-      res.status(404).json({ error: 'Workout not found' });
+      return sendError(res, 404, 'Workout not found');
       return;
     }
 
     // Check if user owns this workout
     if (workout.userId.toString() !== userId) {
-      res.status(403).json({ error: 'Access denied' });
+      return sendError(res, 403, 'Access denied');
       return;
     }
 
@@ -158,7 +154,7 @@ export const updateWorkout = async (req: AuthRequest, res: Response): Promise<vo
     });
   } catch (error) {
     console.error('Update workout error:', error);
-    res.status(500).json({ error: 'Failed to update workout' });
+    return sendError(res, 500, 'Failed to update workout');
   }
 };
 
@@ -168,20 +164,19 @@ export const deleteWorkout = async (req: AuthRequest, res: Response): Promise<vo
     const { workoutId } = req.params;
 
     if (!userId) {
-      res.status(401).json({ error: 'User not authenticated' });
-      return;
+      return sendError(res, 401, 'User not authenticated');
     }
 
     const workout = await Workout.findById(workoutId);
 
     if (!workout) {
-      res.status(404).json({ error: 'Workout not found' });
+      return sendError(res, 404, 'Workout not found');
       return;
     }
 
     // Check if user owns this workout
     if (workout.userId.toString() !== userId) {
-      res.status(403).json({ error: 'Access denied' });
+      return sendError(res, 403, 'Access denied');
       return;
     }
 
@@ -195,7 +190,7 @@ export const deleteWorkout = async (req: AuthRequest, res: Response): Promise<vo
     res.status(200).json({ message: 'Workout deleted successfully' });
   } catch (error) {
     console.error('Delete workout error:', error);
-    res.status(500).json({ error: 'Failed to delete workout' });
+    return sendError(res, 500, 'Failed to delete workout');
   }
 };
 
@@ -205,8 +200,7 @@ export const getExerciseHistory = async (req: AuthRequest, res: Response): Promi
     const { exerciseId } = req.params;
 
     if (!userId) {
-      res.status(401).json({ error: 'User not authenticated' });
-      return;
+      return sendError(res, 401, 'User not authenticated');
     }
 
     const workouts = await Workout.find({
@@ -229,7 +223,7 @@ export const getExerciseHistory = async (req: AuthRequest, res: Response): Promi
     res.status(200).json({ history });
   } catch (error) {
     console.error('Get exercise history error:', error);
-    res.status(500).json({ error: 'Failed to fetch exercise history' });
+    return sendError(res, 500, 'Failed to fetch exercise history');
   }
 };
 

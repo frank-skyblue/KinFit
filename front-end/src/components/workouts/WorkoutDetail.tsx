@@ -1,14 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import {
-  DndContext,
-  closestCenter,
-  PointerSensor,
-  TouchSensor,
-  useSensor,
-  useSensors,
-  DragEndEvent,
-} from '@dnd-kit/core';
+import { DndContext, closestCenter, DragEndEvent } from '@dnd-kit/core';
 import {
   SortableContext,
   verticalListSortingStrategy,
@@ -26,6 +18,7 @@ import {
   deleteWorkout,
   updateWorkout,
   getExercises,
+  createExerciseEntry,
   Workout,
   Exercise,
   ExerciseEntry,
@@ -33,10 +26,10 @@ import {
   uniqueId,
 } from '../../services/api';
 import { useAuth } from '../../contexts/AuthContext';
-
-function getErrorMessage(err: unknown): string | undefined {
-  return (err as { response?: { data?: { error?: string } } }).response?.data?.error;
-}
+import { getApiErrorMessage } from '../../utils/errors';
+import { useWorkoutDnDSensors } from '../../hooks/useWorkoutDnDSensors';
+import LoadingSpinner from '../common/LoadingSpinner';
+import ErrorAlert from '../common/ErrorAlert';
 
 
 const WorkoutDetail = () => {
@@ -58,11 +51,7 @@ const WorkoutDetail = () => {
   const [showExercisePicker, setShowExercisePicker] = useState(false);
   const [isDragActive, setIsDragActive] = useState(false);
 
-  // DnD sensors — activate after 8px of movement to avoid blocking taps/clicks
-  const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
-    useSensor(TouchSensor, { activationConstraint: { delay: 200, tolerance: 6 } }),
-  );
+  const sensors = useWorkoutDnDSensors();
 
   // Fetch workout
   useEffect(() => {
@@ -74,7 +63,7 @@ const WorkoutDetail = () => {
         setWorkout(response.workout);
       } catch (err: unknown) {
         console.error('Failed to fetch workout:', err);
-        setError(getErrorMessage(err) || 'Failed to load workout');
+        setError(getApiErrorMessage(err) || 'Failed to load workout');
       } finally {
         setIsLoading(false);
       }
@@ -104,7 +93,7 @@ const WorkoutDetail = () => {
       await deleteWorkout(workoutId);
       navigate('/workouts');
     } catch (err: unknown) {
-      setError(getErrorMessage(err) || 'Failed to delete workout');
+      setError(getApiErrorMessage(err) || 'Failed to delete workout');
       setIsDeleting(false);
       setShowDeleteConfirm(false);
     }
@@ -145,7 +134,7 @@ const WorkoutDetail = () => {
       setIsEditing(false);
       setEditData(null);
     } catch (err: unknown) {
-      setError(getErrorMessage(err) || 'Failed to save workout');
+      setError(getApiErrorMessage(err) || 'Failed to save workout');
     } finally {
       setIsSaving(false);
     }
@@ -170,28 +159,7 @@ const WorkoutDetail = () => {
 
   const handleAddExercise = (exercise: Exercise) => {
     if (!editData) return;
-
-    const cat = exercise.category as ExerciseEntry['category'];
-    const defaultEntries =
-      cat === 'cardio'      ? [{ duration: 30, intensityZone: 2 }] :
-      cat === 'flexibility'  ? [{ duration: 30 }] :
-      cat === 'other'        ? [] :
-      /* strength */           [{ weightValue: 0, weightType: 'a' as const, reps: 10, sets: 3 }];
-    const isStrength = !cat || cat === 'strength';
-
-    const newExercise: ExerciseEntry = {
-      exerciseId: exercise._id,
-      exerciseName: exercise.name,
-      category: cat,
-      weightValue: isStrength ? 0 : undefined,
-      weightType: isStrength ? 'a' : undefined,
-      reps: isStrength ? 10 : undefined,
-      sets: isStrength ? 3 : undefined,
-      setEntries: defaultEntries.length > 0 ? defaultEntries : undefined,
-      notes: '',
-      orderIndex: editData.exercises.length,
-      _dragId: uniqueId(),
-    };
+    const newExercise = createExerciseEntry(exercise, editData.exercises.length);
     setEditData({
       ...editData,
       exercises: [...editData.exercises, newExercise],
@@ -223,7 +191,7 @@ const WorkoutDetail = () => {
     return (
       <Layout>
         <div className="max-w-4xl mx-auto text-center py-12">
-          <div className="inline-block h-12 w-12 animate-spin rounded-full border-4 border-solid border-kin-coral border-r-transparent"></div>
+          <LoadingSpinner size="md" />
         </div>
       </Layout>
     );
@@ -268,11 +236,7 @@ const WorkoutDetail = () => {
           onDelete={() => setShowDeleteConfirm(true)}
         />
 
-        {error && (
-          <div className="mb-6 p-4 bg-kin-coral-100 border border-kin-coral-300 rounded-kin-sm">
-            <p className="text-kin-coral-800 text-sm font-inter">{error}</p>
-          </div>
-        )}
+        {error && <ErrorAlert message={error} className="mb-6" />}
 
         {showDeleteConfirm && (
           <ConfirmModal
@@ -287,7 +251,7 @@ const WorkoutDetail = () => {
 
         <WorkoutSummary
           workout={workout}
-          units={user?.units || 'lbs'}
+          units={user!.units}
           isEditing={isEditing}
           editData={editData}
           onEditDataChange={setEditData}
@@ -336,7 +300,7 @@ const WorkoutDetail = () => {
                       id={exercise._dragId!}
                       exercise={exercise}
                       index={index}
-                      units={user?.units || 'lbs'}
+                      units={user!.units}
                       onUpdate={handleUpdateExercise}
                       onRemove={handleRemoveExercise}
                       forceCollapsed={isDragActive}

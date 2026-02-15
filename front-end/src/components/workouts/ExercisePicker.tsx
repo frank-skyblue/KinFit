@@ -48,11 +48,11 @@ const ExercisePicker = ({ exercises, isLoading, onSelect, onClose }: ExercisePic
     const handleTouchMove = (e: TouchEvent) => {
       if (e.target === backdrop) e.preventDefault();
     };
-    backdrop?.addEventListener('touchmove', handleTouchMove, { passive: false });
+    if (backdrop) backdrop.addEventListener('touchmove', handleTouchMove, { passive: false });
 
     return () => {
       document.removeEventListener('keydown', handleKeyDown);
-      backdrop?.removeEventListener('touchmove', handleTouchMove);
+      if (backdrop) backdrop.removeEventListener('touchmove', handleTouchMove);
       html.style.overflow = '';
       html.style.position = '';
       html.style.top = '';

@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { AUTH_TOKEN_KEY, USER_KEY } from '../constants/auth';
 
 // API URL configuration:
 // - VITE_API_URL env var: Use if explicitly set
@@ -15,7 +16,7 @@ const api = axios.create({
 
 // Add token to requests if available
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('authToken');
+  const token = localStorage.getItem(AUTH_TOKEN_KEY);
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
@@ -27,8 +28,8 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      localStorage.removeItem('authToken');
-      localStorage.removeItem('user');
+      localStorage.removeItem(AUTH_TOKEN_KEY);
+      localStorage.removeItem(USER_KEY);
       window.location.href = '/login';
     }
     return Promise.reject(error);
@@ -61,8 +62,8 @@ export interface User {
   height?: number;
   weight?: number;
   activityLevel?: 'sedentary' | 'light' | 'moderate' | 'active' | 'very_active';
-  totalWorkouts?: number;
-  currentStreak?: number;
+  totalWorkouts: number; // Backend always provides (default 0)
+  currentStreak: number; // Backend always provides (default 0)
   settings?: {
     defaultWorkoutVisibility: 'private' | 'shared';
     notifications: {
@@ -130,6 +131,43 @@ export const uniqueId = (): string => {
   catch { return `_drag_${Date.now()}_${++_uid}`; }
 };
 
+/** Create a new ExerciseEntry from an Exercise, with defaults based on category */
+export const createExerciseEntry = (
+  exercise: Exercise,
+  orderIndex: number
+): ExerciseEntry => {
+  const cat = exercise.category as ExerciseEntry['category'];
+  let defaultEntries: SetEntry[];
+  switch (cat) {
+    case 'cardio':
+      defaultEntries = [{ duration: 30, intensityZone: 2 }];
+      break;
+    case 'flexibility':
+      defaultEntries = [{ duration: 30 }];
+      break;
+    case 'other':
+      defaultEntries = [];
+      break;
+    default:
+      defaultEntries = [{ weightValue: 0, weightType: 'a' as const, reps: 10, sets: 3 }];
+  }
+  const isStrength = !cat || cat === 'strength';
+
+  return {
+    exerciseId: exercise._id,
+    exerciseName: exercise.name,
+    category: cat,
+    weightValue: isStrength ? 0 : undefined,
+    weightType: isStrength ? 'a' : undefined,
+    reps: isStrength ? 10 : undefined,
+    sets: isStrength ? 3 : undefined,
+    setEntries: defaultEntries.length > 0 ? defaultEntries : undefined,
+    notes: '',
+    orderIndex,
+    _dragId: uniqueId(),
+  };
+};
+
 /** Resolve set entries from an exercise, falling back to legacy single-line fields */
 export const getSetEntries = (exercise: ExerciseEntry): SetEntry[] => {
   if (exercise.setEntries && exercise.setEntries.length > 0) return exercise.setEntries;
@@ -168,12 +206,14 @@ export const normalizeExerciseForSave = (exercise: ExerciseEntry): ExerciseEntry
     return { ...rest, setEntries: entries.length > 0 ? entries : undefined };
   }
 
+  if (!first) return { ...rest, setEntries: entries };
+
   return {
     ...rest,
-    weightValue: first?.weightValue,
-    weightType: first?.weightType,
-    reps: first?.reps,
-    sets: first?.sets,
+    weightValue: first.weightValue,
+    weightType: first.weightType,
+    reps: first.reps,
+    sets: first.sets,
     setEntries: entries,
   };
 };
@@ -186,7 +226,7 @@ export interface Workout {
   notes?: string;
   visibility: 'private' | 'shared';
   exercises: ExerciseEntry[];
-  totalVolume?: number;
+  totalVolume: number; // Backend always provides (default 0)
   duration?: number;
   tags?: string[];
   createdAt?: string;

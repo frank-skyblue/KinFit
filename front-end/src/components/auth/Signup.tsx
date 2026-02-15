@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import ErrorAlert from '../common/ErrorAlert';
 
 const Signup = () => {
   const navigate = useNavigate();
@@ -74,11 +75,7 @@ const Signup = () => {
           </div>
 
           {/* Error Message */}
-          {error && (
-            <div className="mb-6 p-4 bg-kin-coral-100 border border-kin-coral-300 rounded-kin-sm">
-              <p className="text-kin-coral-800 text-sm font-inter">{error}</p>
-            </div>
-          )}
+          {error && <ErrorAlert message={error} className="mb-6" />}
 
           {/* Signup Form */}
           <form onSubmit={handleSubmit}>

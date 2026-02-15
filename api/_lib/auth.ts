@@ -1,4 +1,5 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
+import { sendError } from './errorResponse';
 import jwt from 'jsonwebtoken';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'kinfit_default_secret_change_in_production';
@@ -37,14 +38,14 @@ export const authenticate = (
   const token = authHeader && authHeader.split(' ')[1];
 
   if (!token) {
-    res.status(401).json({ error: 'Access token required' });
+    sendError(res, 401, 'Access token required');
     return null;
   }
 
   const payload = verifyToken(token);
 
   if (!payload) {
-    res.status(403).json({ error: 'Invalid or expired token' });
+    sendError(res, 403, 'Invalid or expired token');
     return null;
   }
 

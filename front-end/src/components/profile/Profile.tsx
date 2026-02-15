@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getProfile, updateProfile, User, ProfileUpdateData } from '../../services/api';
+import { USER_KEY } from '../../constants/auth';
 import Layout from '../dashboard/Layout';
 
 const calculateAge = (birthdate: string | undefined | null): number | null => {
@@ -93,10 +94,10 @@ const Profile = () => {
       setSuccessMessage('Profile updated successfully!');
 
       // Update localStorage user data
-      const storedUser = localStorage.getItem('user');
+      const storedUser = localStorage.getItem(USER_KEY);
       if (storedUser) {
         const updatedUser = { ...JSON.parse(storedUser), ...response.user };
-        localStorage.setItem('user', JSON.stringify(updatedUser));
+        localStorage.setItem(USER_KEY, JSON.stringify(updatedUser));
       }
 
       setTimeout(() => setSuccessMessage(''), 3000);
@@ -117,6 +118,27 @@ const Profile = () => {
       </Layout>
     );
   }
+
+  if (error && !user) {
+    return (
+      <Layout>
+        <div className="max-w-2xl mx-auto">
+          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-kin-sm">
+            {error}
+          </div>
+          <button
+            type="button"
+            onClick={() => window.location.reload()}
+            className="mt-4 bg-kin-coral text-white rounded-kin-sm font-semibold py-2 px-4"
+          >
+            Try Again
+          </button>
+        </div>
+      </Layout>
+    );
+  }
+
+  if (!user) return null;
 
   const age = calculateAge(formData.birthdate);
 
@@ -166,7 +188,7 @@ const Profile = () => {
                 </label>
                 <input
                   type="text"
-                  value={user?.username || ''}
+                  value={user.username}
                   disabled
                   className="w-full px-3 py-2 bg-kin-stone-100 border border-kin-stone-200 rounded-kin-sm text-kin-stone-500 cursor-not-allowed"
                 />
@@ -177,7 +199,7 @@ const Profile = () => {
                 </label>
                 <input
                   type="email"
-                  value={user?.email || ''}
+                  value={user.email}
                   disabled
                   className="w-full px-3 py-2 bg-kin-stone-100 border border-kin-stone-200 rounded-kin-sm text-kin-stone-500 cursor-not-allowed"
                 />
@@ -379,18 +401,18 @@ const Profile = () => {
             <div className="grid grid-cols-2 gap-4">
               <div className="text-center p-4 bg-kin-teal-50 rounded-kin-sm">
                 <p className="text-3xl font-bold font-montserrat text-kin-teal">
-                  {user?.totalWorkouts || 0}
+                  {user.totalWorkouts}
                 </p>
                 <p className="text-sm text-kin-stone-600">Total Workouts</p>
               </div>
               <div className="text-center p-4 bg-kin-coral-50 rounded-kin-sm">
                 <p className="text-3xl font-bold font-montserrat text-kin-coral">
-                  {user?.currentStreak || 0}
+                  {user.currentStreak}
                 </p>
                 <p className="text-sm text-kin-stone-600">Current Streak</p>
               </div>
             </div>
-            {user?.createdAt && (
+            {user.createdAt && (
               <p className="text-sm text-kin-stone-500 mt-4 text-center">
                 Member since {new Date(user.createdAt).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
               </p>

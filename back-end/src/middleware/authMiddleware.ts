@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { verifyToken, TokenPayload } from '../services/authenticationService';
+import { sendError } from '../utils/errorResponse';
 
 export interface AuthRequest extends Request {
   user?: TokenPayload;
@@ -15,21 +16,19 @@ export const authenticateToken = (
     const token = authHeader && authHeader.split(' ')[1]; // Bearer TOKEN
 
     if (!token) {
-      res.status(401).json({ error: 'Access token required' });
-      return;
+      return sendError(res, 401, 'Access token required');
     }
 
     const payload = verifyToken(token);
 
     if (!payload) {
-      res.status(403).json({ error: 'Invalid or expired token' });
-      return;
+      return sendError(res, 403, 'Invalid or expired token');
     }
 
     req.user = payload;
     next();
   } catch (error) {
-    res.status(403).json({ error: 'Token verification failed' });
+    return sendError(res, 403, 'Token verification failed');
   }
 };
 

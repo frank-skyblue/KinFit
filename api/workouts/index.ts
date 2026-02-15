@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 import { cors } from '../_lib/cors';
 import connectDB from '../_lib/db';
 import { authenticate } from '../_lib/auth';
+import { sendError } from '../_lib/errorResponse';
 import Workout from '../_lib/models/Workout';
 import User from '../_lib/models/User';
 
@@ -34,7 +35,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       });
     } catch (error) {
       console.error('Get workouts error:', error);
-      return res.status(500).json({ error: 'Failed to fetch workouts' });
+      return sendError(res, 500, 'Failed to fetch workouts');
     }
   }
 
@@ -44,7 +45,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const { date, title, notes, visibility, exercises, duration, tags } = req.body;
 
       if (!exercises || exercises.length === 0) {
-        return res.status(400).json({ error: 'At least one exercise is required' });
+        return sendError(res, 400, 'At least one exercise is required');
       }
 
       const workout = new Workout({
@@ -65,9 +66,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(201).json({ message: 'Workout created successfully', workout });
     } catch (error) {
       console.error('Create workout error:', error);
-      return res.status(500).json({ error: 'Failed to create workout' });
+      return sendError(res, 500, 'Failed to create workout');
     }
   }
 
-  return res.status(405).json({ error: 'Method not allowed' });
+  return sendError(res, 405, 'Method not allowed');
 }

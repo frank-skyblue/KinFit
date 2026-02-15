@@ -1,20 +1,13 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import Layout from '../dashboard/Layout';
+import LoadingSpinner from '../common/LoadingSpinner';
 import { getWorkouts, Workout } from '../../services/api';
 import { useAuth } from '../../contexts/AuthContext';
-
-const formatDate = (dateString: string) => {
-  return new Date(dateString).toLocaleDateString('en-US', {
-    weekday: 'short',
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-  });
-};
+import { formatDateWithWeekday } from '../../utils/date';
 
 const WorkoutList = () => {
-  const { user } = useAuth();
+  const { user } = useAuth(); // ProtectedRoute guarantees user exists
   const [workouts, setWorkouts] = useState<Workout[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [page, setPage] = useState(1);
@@ -59,7 +52,7 @@ const WorkoutList = () => {
 
         {isLoading ? (
           <div className="text-center py-12">
-            <div className="inline-block h-12 w-12 animate-spin rounded-full border-4 border-solid border-kin-coral border-r-transparent"></div>
+            <LoadingSpinner size="md" />
           </div>
         ) : workouts.length === 0 ? (
           <div className="bg-white rounded-kin-lg shadow-kin-medium p-12 text-center">
@@ -92,15 +85,15 @@ const WorkoutList = () => {
                         {workout.title || 'Workout Session'}
                       </h3>
                       <p className="text-sm text-kin-teal font-inter">
-                        {formatDate(workout.date)}
+                        {formatDateWithWeekday(workout.date)}
                       </p>
                     </div>
                     <div className="text-right">
                       <p className="text-sm text-kin-teal font-inter">Total Volume</p>
                       <p className="text-2xl font-bold font-montserrat text-kin-navy">
-                        {workout.totalVolume?.toLocaleString() || 0}
+                        {workout.totalVolume.toLocaleString()}
                       </p>
-                      <p className="text-xs text-kin-teal font-inter">{user?.units || 'lbs'}</p>
+                      <p className="text-xs text-kin-teal font-inter">{user!.units}</p>
                     </div>
                   </div>
 

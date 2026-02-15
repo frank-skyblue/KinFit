@@ -2,15 +2,9 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { getWorkouts, Workout } from '../../services/api';
+import { formatDateShort } from '../../utils/date';
 import Layout from './Layout';
-
-const formatDate = (dateString: string) => {
-  return new Date(dateString).toLocaleDateString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-  });
-};
+import LoadingSpinner from '../common/LoadingSpinner';
 
 const Dashboard = () => {
   const { user } = useAuth();
@@ -38,7 +32,7 @@ const Dashboard = () => {
         {/* Welcome Header - Compact */}
         <div className="flex items-center justify-between">
           <h1 className="text-xl font-semibold font-montserrat text-kin-navy">
-            Hi, {user?.displayName?.split(' ')[0] || 'there'}!
+            Hi, {user!.displayName.split(' ')[0] || 'there'}!
           </h1>
           <Link
             to="/workouts/new"
@@ -77,21 +71,21 @@ const Dashboard = () => {
           <div className="flex items-center justify-around text-center">
             <div className="flex-1">
               <p className="text-xl font-bold font-montserrat text-kin-navy">
-                {user?.totalWorkouts || 0}
+                {user!.totalWorkouts}
               </p>
               <p className="text-xs font-inter text-kin-stone-500">Workouts</p>
             </div>
             <div className="w-px h-8 bg-kin-stone-200" />
             <div className="flex-1">
               <p className="text-xl font-bold font-montserrat text-kin-coral">
-                {user?.currentStreak || 0}
+                {user!.currentStreak}
               </p>
               <p className="text-xs font-inter text-kin-stone-500">Day Streak</p>
             </div>
             <div className="w-px h-8 bg-kin-stone-200" />
             <div className="flex-1">
               <p className="text-xl font-bold font-montserrat text-kin-teal">
-                {user?.units || 'lbs'}
+                {user!.units}
               </p>
               <p className="text-xs font-inter text-kin-stone-500">Units</p>
             </div>
@@ -115,7 +109,7 @@ const Dashboard = () => {
 
           {isLoading ? (
             <div className="text-center py-6">
-              <div className="inline-block h-6 w-6 animate-spin rounded-full border-3 border-solid border-kin-coral border-r-transparent" />
+              <LoadingSpinner size="sm" />
             </div>
           ) : workouts.length === 0 ? (
             <div className="text-center py-6">
@@ -141,14 +135,14 @@ const Dashboard = () => {
                         {workout.title || 'Workout Session'}
                       </h3>
                       <p className="text-xs text-kin-stone-500 font-inter">
-                        {formatDate(workout.date)} • {workout.exercises.length} exercises
+                        {formatDateShort(workout.date)} • {workout.exercises.length} exercises
                       </p>
                     </div>
                     <div className="text-right ml-3">
                       <p className="font-semibold font-montserrat text-kin-navy text-sm">
-                        {workout.totalVolume?.toLocaleString() || 0}
+                        {workout.totalVolume.toLocaleString()}
                       </p>
-                      <p className="text-xs text-kin-stone-500">{user?.units || 'lbs'}</p>
+                      <p className="text-xs text-kin-stone-500">{user!.units}</p>
                     </div>
                   </div>
                 </Link>

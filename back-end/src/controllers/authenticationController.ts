@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { registerUser, loginUser } from '../services/authenticationService';
+import { sendError } from '../utils/errorResponse';
 
 export const register = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -7,18 +8,15 @@ export const register = async (req: Request, res: Response): Promise<void> => {
 
     // Validation
     if (!username || !email || !password || !displayName) {
-      res.status(400).json({ error: 'All fields are required' });
-      return;
+      return sendError(res, 400, 'All fields are required');
     }
 
     if (password.length < 6) {
-      res.status(400).json({ error: 'Password must be at least 6 characters' });
-      return;
+      return sendError(res, 400, 'Password must be at least 6 characters');
     }
 
     if (username.length < 3 || username.length > 30) {
-      res.status(400).json({ error: 'Username must be between 3 and 30 characters' });
-      return;
+      return sendError(res, 400, 'Username must be between 3 and 30 characters');
     }
 
     // Register user
@@ -39,14 +37,15 @@ export const register = async (req: Request, res: Response): Promise<void> => {
         displayName: user.displayName,
         profilePhoto: user.profilePhoto,
         units: user.units,
+        totalWorkouts: user.totalWorkouts,
+        currentStreak: user.currentStreak,
       },
     });
   } catch (error) {
     if (error instanceof Error) {
-      res.status(400).json({ error: error.message });
-    } else {
-      res.status(500).json({ error: 'Registration failed' });
+      return sendError(res, 400, error.message);
     }
+    return sendError(res, 500, 'Registration failed');
   }
 };
 
@@ -56,8 +55,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
 
     // Validation
     if (!email || !password) {
-      res.status(400).json({ error: 'Email and password are required' });
-      return;
+      return sendError(res, 400, 'Email and password are required');
     }
 
     // Login user
@@ -79,10 +77,9 @@ export const login = async (req: Request, res: Response): Promise<void> => {
     });
   } catch (error) {
     if (error instanceof Error) {
-      res.status(401).json({ error: error.message });
-    } else {
-      res.status(500).json({ error: 'Login failed' });
+      return sendError(res, 401, error.message);
     }
+    return sendError(res, 500, 'Login failed');
   }
 };
 
@@ -90,7 +87,7 @@ export const verifyAuth = async (req: Request, res: Response): Promise<void> => 
   try {
     res.status(200).json({ message: 'Authenticated', user: (req as any).user });
   } catch (error) {
-    res.status(500).json({ error: 'Verification failed' });
+    return sendError(res, 500, 'Verification failed');
   }
 };
 

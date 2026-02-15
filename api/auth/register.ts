@@ -3,28 +3,29 @@ import bcrypt from 'bcryptjs';
 import { cors } from '../_lib/cors';
 import connectDB from '../_lib/db';
 import { generateToken } from '../_lib/auth';
+import { sendError } from '../_lib/errorResponse';
 import User from '../_lib/models/User';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (cors(req, res)) return;
 
   if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
+    return sendError(res, 405, 'Method not allowed');
   }
 
   const { username, email, password, displayName } = req.body;
 
   // Validation
   if (!username || !email || !password || !displayName) {
-    return res.status(400).json({ error: 'All fields are required' });
+    return sendError(res, 400, 'All fields are required');
   }
 
   if (password.length < 6) {
-    return res.status(400).json({ error: 'Password must be at least 6 characters' });
+    return sendError(res, 400, 'Password must be at least 6 characters');
   }
 
   if (username.length < 3 || username.length > 30) {
-    return res.status(400).json({ error: 'Username must be between 3 and 30 characters' });
+    return sendError(res, 400, 'Username must be between 3 and 30 characters');
   }
 
   try {
@@ -37,9 +38,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     if (existingUser) {
       if (existingUser.email === email.toLowerCase()) {
-        return res.status(400).json({ error: 'Email already registered' });
+        return sendError(res, 400, 'Email already registered');
       }
-      return res.status(400).json({ error: 'Username already taken' });
+      return sendError(res, 400, 'Username already taken');
     }
 
     // Hash password
@@ -73,10 +74,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         displayName: user.displayName,
         profilePhoto: user.profilePhoto,
         units: user.units,
+        totalWorkouts: user.totalWorkouts,
+        currentStreak: user.currentStreak,
       },
     });
   } catch (error) {
     console.error('Register error:', error);
-    res.status(500).json({ error: 'Registration failed' });
+    return sendError(res, 500, 'Registration failed');
   }
 }

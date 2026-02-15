@@ -61,10 +61,10 @@ const Layout = ({ children }: LayoutProps) => {
     const handleTouchMove = (e: TouchEvent) => {
       if (e.target === backdrop) e.preventDefault();
     };
-    backdrop?.addEventListener('touchmove', handleTouchMove, { passive: false });
+    if (backdrop) backdrop.addEventListener('touchmove', handleTouchMove, { passive: false });
 
     return () => {
-      backdrop?.removeEventListener('touchmove', handleTouchMove);
+      if (backdrop) backdrop.removeEventListener('touchmove', handleTouchMove);
       html.style.overflow = '';
       html.style.position = '';
       html.style.top = '';
@@ -114,11 +114,11 @@ const Layout = ({ children }: LayoutProps) => {
               >
                 <div className="w-10 h-10 rounded-full bg-gradient-to-br from-kin-coral to-kin-teal flex items-center justify-center">
                   <span className="text-white font-bold font-montserrat">
-                    {user?.displayName?.charAt(0).toUpperCase()}
+                    {user!.displayName.charAt(0).toUpperCase()}
                   </span>
                 </div>
                 <span className="text-kin-navy font-semibold font-inter">
-                  {user?.displayName}
+                  {user!.displayName}
                 </span>
                 <svg
                   className={`w-4 h-4 text-kin-navy transition-transform ${

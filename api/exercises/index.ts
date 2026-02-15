@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 import { cors } from '../_lib/cors';
 import connectDB from '../_lib/db';
 import { authenticate } from '../_lib/auth';
+import { sendError } from '../_lib/errorResponse';
 import Exercise from '../_lib/models/Exercise';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
@@ -39,7 +40,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(200).json({ exercises });
     } catch (error) {
       console.error('Get exercises error:', error);
-      return res.status(500).json({ error: 'Failed to fetch exercises' });
+      return sendError(res, 500, 'Failed to fetch exercises');
     }
   }
 
@@ -49,7 +50,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const { name, muscleGroups, description, category } = req.body;
 
       if (!name) {
-        return res.status(400).json({ error: 'Exercise name is required' });
+        return sendError(res, 400, 'Exercise name is required');
       }
 
       const existingExercise = await Exercise.findOne({
@@ -58,7 +59,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       });
 
       if (existingExercise) {
-        return res.status(400).json({ error: 'Exercise already exists' });
+        return sendError(res, 400, 'Exercise already exists');
       }
 
       const exercise = new Exercise({
@@ -75,7 +76,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(201).json({ message: 'Exercise created successfully', exercise });
     } catch (error) {
       console.error('Create exercise error:', error);
-      return res.status(500).json({ error: 'Failed to create exercise' });
+      return sendError(res, 500, 'Failed to create exercise');
     }
   }
 
@@ -85,16 +86,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const { id } = req.query;
 
       if (!id || typeof id !== 'string') {
-        return res.status(400).json({ error: 'Exercise ID is required' });
+        return sendError(res, 400, 'Exercise ID is required');
       }
 
       const exercise = await Exercise.findById(id);
       if (!exercise) {
-        return res.status(404).json({ error: 'Exercise not found' });
+        return sendError(res, 404, 'Exercise not found');
       }
 
       if (!exercise.isCustom || exercise.createdByUserId?.toString() !== user.userId) {
-        return res.status(403).json({ error: 'You can only edit your own custom exercises' });
+        return sendError(res, 403, 'You can only edit your own custom exercises');
       }
 
       const { name, muscleGroups, description, category } = req.body;
@@ -107,7 +108,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(200).json({ message: 'Exercise updated successfully', exercise });
     } catch (error) {
       console.error('Update exercise error:', error);
-      return res.status(500).json({ error: 'Failed to update exercise' });
+      return sendError(res, 500, 'Failed to update exercise');
     }
   }
 
@@ -117,25 +118,25 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const { id } = req.query;
 
       if (!id || typeof id !== 'string') {
-        return res.status(400).json({ error: 'Exercise ID is required' });
+        return sendError(res, 400, 'Exercise ID is required');
       }
 
       const exercise = await Exercise.findById(id);
       if (!exercise) {
-        return res.status(404).json({ error: 'Exercise not found' });
+        return sendError(res, 404, 'Exercise not found');
       }
 
       if (!exercise.isCustom || exercise.createdByUserId?.toString() !== user.userId) {
-        return res.status(403).json({ error: 'You can only delete your own custom exercises' });
+        return sendError(res, 403, 'You can only delete your own custom exercises');
       }
 
       await exercise.deleteOne();
       return res.status(200).json({ message: 'Exercise deleted successfully' });
     } catch (error) {
       console.error('Delete exercise error:', error);
-      return res.status(500).json({ error: 'Failed to delete exercise' });
+      return sendError(res, 500, 'Failed to delete exercise');
     }
   }
 
-  return res.status(405).json({ error: 'Method not allowed' });
+  return sendError(res, 405, 'Method not allowed');
 }

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import Layout from '../dashboard/Layout';
+import LoadingSpinner from '../common/LoadingSpinner';
 import ConfirmModal from '../common/ConfirmModal';
 import SearchInput from '../common/SearchInput';
 import ExerciseFormModal from './ExerciseFormModal';
@@ -195,7 +196,7 @@ const ExerciseLibrary = () => {
         {/* Exercise Grid */}
         {isLoading ? (
           <div className="text-center py-12">
-            <div className="inline-block h-12 w-12 animate-spin rounded-full border-4 border-solid border-kin-coral border-r-transparent"></div>
+            <LoadingSpinner size="md" />
           </div>
         ) : filteredExercises.length === 0 ? (
           <div className="bg-white rounded-kin-lg shadow-kin-medium p-12 text-center">

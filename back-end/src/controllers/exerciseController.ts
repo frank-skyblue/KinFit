@@ -1,6 +1,7 @@
 import { Response } from 'express';
 import { AuthRequest } from '../middleware/authMiddleware';
 import Exercise from '../models/Exercise';
+import { sendError } from '../utils/errorResponse';
 import mongoose from 'mongoose';
 
 export const getExercises = async (req: AuthRequest, res: Response): Promise<void> => {
@@ -29,7 +30,7 @@ export const getExercises = async (req: AuthRequest, res: Response): Promise<voi
     res.status(200).json({ exercises });
   } catch (error) {
     console.error('Get exercises error:', error);
-    res.status(500).json({ error: 'Failed to fetch exercises' });
+    return sendError(res, 500, 'Failed to fetch exercises');
   }
 };
 
@@ -38,15 +39,13 @@ export const createExercise = async (req: AuthRequest, res: Response): Promise<v
     const userId = req.user?.userId;
 
     if (!userId) {
-      res.status(401).json({ error: 'User not authenticated' });
-      return;
+      return sendError(res, 401, 'User not authenticated');
     }
 
     const { name, muscleGroups, description, category } = req.body;
 
     if (!name) {
-      res.status(400).json({ error: 'Exercise name is required' });
-      return;
+      return sendError(res, 400, 'Exercise name is required');
     }
 
     const existingExercise = await Exercise.findOne({
@@ -55,8 +54,7 @@ export const createExercise = async (req: AuthRequest, res: Response): Promise<v
     });
 
     if (existingExercise) {
-      res.status(400).json({ error: 'Exercise already exists' });
-      return;
+      return sendError(res, 400, 'Exercise already exists');
     }
 
     const exercise = new Exercise({
@@ -76,7 +74,7 @@ export const createExercise = async (req: AuthRequest, res: Response): Promise<v
     });
   } catch (error) {
     console.error('Create exercise error:', error);
-    res.status(500).json({ error: 'Failed to create exercise' });
+    return sendError(res, 500, 'Failed to create exercise');
   }
 };
 
@@ -87,14 +85,13 @@ export const getExerciseById = async (req: AuthRequest, res: Response): Promise<
     const exercise = await Exercise.findById(exerciseId);
 
     if (!exercise) {
-      res.status(404).json({ error: 'Exercise not found' });
-      return;
+      return sendError(res, 404, 'Exercise not found');
     }
 
     res.status(200).json({ exercise });
   } catch (error) {
     console.error('Get exercise error:', error);
-    res.status(500).json({ error: 'Failed to fetch exercise' });
+    return sendError(res, 500, 'Failed to fetch exercise');
   }
 };
 
@@ -104,20 +101,17 @@ export const updateExercise = async (req: AuthRequest, res: Response): Promise<v
     const { exerciseId } = req.params;
 
     if (!userId) {
-      res.status(401).json({ error: 'User not authenticated' });
-      return;
+      return sendError(res, 401, 'User not authenticated');
     }
 
     const exercise = await Exercise.findById(exerciseId);
 
     if (!exercise) {
-      res.status(404).json({ error: 'Exercise not found' });
-      return;
+      return sendError(res, 404, 'Exercise not found');
     }
 
     if (!exercise.isCustom || exercise.createdByUserId?.toString() !== userId) {
-      res.status(403).json({ error: 'You can only edit your own custom exercises' });
-      return;
+      return sendError(res, 403, 'You can only edit your own custom exercises');
     }
 
     const { name, muscleGroups, description, category } = req.body;
@@ -132,7 +126,7 @@ export const updateExercise = async (req: AuthRequest, res: Response): Promise<v
     res.status(200).json({ message: 'Exercise updated successfully', exercise });
   } catch (error) {
     console.error('Update exercise error:', error);
-    res.status(500).json({ error: 'Failed to update exercise' });
+    return sendError(res, 500, 'Failed to update exercise');
   }
 };
 
@@ -142,20 +136,17 @@ export const deleteExercise = async (req: AuthRequest, res: Response): Promise<v
     const { exerciseId } = req.params;
 
     if (!userId) {
-      res.status(401).json({ error: 'User not authenticated' });
-      return;
+      return sendError(res, 401, 'User not authenticated');
     }
 
     const exercise = await Exercise.findById(exerciseId);
 
     if (!exercise) {
-      res.status(404).json({ error: 'Exercise not found' });
-      return;
+      return sendError(res, 404, 'Exercise not found');
     }
 
     if (!exercise.isCustom || exercise.createdByUserId?.toString() !== userId) {
-      res.status(403).json({ error: 'You can only delete your own custom exercises' });
-      return;
+      return sendError(res, 403, 'You can only delete your own custom exercises');
     }
 
     await exercise.deleteOne();
@@ -163,6 +154,6 @@ export const deleteExercise = async (req: AuthRequest, res: Response): Promise<v
     res.status(200).json({ message: 'Exercise deleted successfully' });
   } catch (error) {
     console.error('Delete exercise error:', error);
-    res.status(500).json({ error: 'Failed to delete exercise' });
+    return sendError(res, 500, 'Failed to delete exercise');
   }
 };

@@ -1,6 +1,7 @@
 import { Response } from 'express';
 import { AuthRequest } from '../middleware/authMiddleware';
 import User from '../models/User';
+import { sendError } from '../utils/errorResponse';
 
 export const getProfile = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
@@ -9,8 +10,7 @@ export const getProfile = async (req: AuthRequest, res: Response): Promise<void>
     const user = await User.findById(userId).select('-password');
 
     if (!user) {
-      res.status(404).json({ error: 'User not found' });
-      return;
+      return sendError(res, 404, 'User not found');
     }
 
     res.json({
@@ -36,7 +36,7 @@ export const getProfile = async (req: AuthRequest, res: Response): Promise<void>
     });
   } catch (error) {
     console.error('Get profile error:', error);
-    res.status(500).json({ error: 'Failed to get profile' });
+    return sendError(res, 500, 'Failed to get profile');
   }
 };
 
@@ -77,8 +77,7 @@ export const updateProfile = async (req: AuthRequest, res: Response): Promise<vo
     ).select('-password');
 
     if (!user) {
-      res.status(404).json({ error: 'User not found' });
-      return;
+      return sendError(res, 404, 'User not found');
     }
 
     res.json({
@@ -105,6 +104,6 @@ export const updateProfile = async (req: AuthRequest, res: Response): Promise<vo
     });
   } catch (error) {
     console.error('Update profile error:', error);
-    res.status(500).json({ error: 'Failed to update profile' });
+    return sendError(res, 500, 'Failed to update profile');
   }
 };

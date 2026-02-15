@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { Workout } from '../../services/api';
+import { formatDateLong } from '../../utils/date';
 
 interface WorkoutDetailHeaderProps {
   workout: Workout;
@@ -12,16 +13,6 @@ interface WorkoutDetailHeaderProps {
   onSaveEdit: () => void;
   onDelete: () => void;
 }
-
-const formatDate = (dateString: string) => {
-  const date = new Date(dateString);
-  return date.toLocaleDateString('en-US', {
-    weekday: 'long',
-    month: 'long',
-    day: 'numeric',
-    year: 'numeric',
-  });
-};
 
 const WorkoutDetailHeader = ({
   workout,
@@ -66,7 +57,7 @@ const WorkoutDetailHeader = ({
             <h1 className="text-2xl sm:text-3xl font-bold font-montserrat text-kin-navy mb-1">
             {workout.title || 'Workout Session'}
           </h1>
-            <p className="text-sm sm:text-base text-kin-teal font-inter">{formatDate(workout.date)}</p>
+            <p className="text-sm sm:text-base text-kin-teal font-inter">{formatDateLong(workout.date)}</p>
         </>
       )}
     </div>
