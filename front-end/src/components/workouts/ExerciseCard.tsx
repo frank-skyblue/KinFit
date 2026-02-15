@@ -226,7 +226,7 @@ const ExerciseCard = ({ exercise, index, units, onUpdate, onRemove, dragHandlePr
                         <FormSelect
                           label={entryIndex === 0 ? 'Type' : undefined}
                           size="compact"
-                          options={WEIGHT_TYPE_OPTIONS}
+                          options={[...WEIGHT_TYPE_OPTIONS]}
                           value={entry.weightType || 'a'}
                           onChange={(e) => handleUpdateEntry(entryIndex, 'weightType', e.target.value)}
                         />

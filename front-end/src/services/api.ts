@@ -253,25 +253,42 @@ export interface Workout {
 // API — Authentication
 // -----------------------------------------------------------------------------
 
-export const register = (data: RegisterData) => request.post('/auth/register', data);
+export interface AuthResponse {
+  token: string;
+  user: User;
+}
 
-export const login = (data: LoginData) => request.post('/auth/login', data);
+export const register = (data: RegisterData) =>
+  request.post<AuthResponse>('/auth/register', data);
 
-export const verifyAuth = () => request.get('/auth/verify');
+export const login = (data: LoginData) =>
+  request.post<AuthResponse>('/auth/login', data);
+
+export const verifyAuth = () => request.get<{ user: User }>('/auth/verify');
 
 // -----------------------------------------------------------------------------
 // API — Workouts
 // -----------------------------------------------------------------------------
 
+export interface GetWorkoutsResponse {
+  workouts: Workout[];
+  pagination: { page: number; limit: number; total: number; totalPages: number };
+}
+
+export interface GetWorkoutResponse {
+  workout: Workout;
+}
+
 export const createWorkout = (workout: Workout) => request.post('/workouts', workout);
 
 export const getWorkouts = (page = 1, limit = 20) =>
-  request.get('/workouts', { params: { page, limit } });
+  request.get<GetWorkoutsResponse>('/workouts', { params: { page, limit } });
 
-export const getWorkoutById = (workoutId: string) => request.get(`/workouts/${workoutId}`);
+export const getWorkoutById = (workoutId: string) =>
+  request.get<GetWorkoutResponse>(`/workouts/${workoutId}`);
 
 export const updateWorkout = (workoutId: string, workout: Partial<Workout>) =>
-  request.put(`/workouts/${workoutId}`, workout);
+  request.put<GetWorkoutResponse>(`/workouts/${workoutId}`, workout);
 
 export const deleteWorkout = (workoutId: string) => request.delete(`/workouts/${workoutId}`);
 
@@ -289,8 +306,12 @@ export interface GetExercisesParams {
   muscleGroup?: MuscleGroup;
 }
 
+export interface GetExercisesResponse {
+  exercises: Exercise[];
+}
+
 export const getExercises = (params?: GetExercisesParams) =>
-  request.get('/exercises', { params: params ?? {} });
+  request.get<GetExercisesResponse>('/exercises', { params: params ?? {} });
 
 export const createExercise = (exercise: {
   name: string;
