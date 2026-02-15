@@ -45,7 +45,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         delete query.$or;
       }
 
-      const exercises = await Exercise.find(query).sort({ name: 1 }).limit(500);
+      const exercises = await Exercise.find(query)
+        .sort({ name: 1 })
+        .limit(500)
+        .lean();
 
       return res.status(200).json({ exercises });
     } catch (error) {

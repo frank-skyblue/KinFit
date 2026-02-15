@@ -22,7 +22,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   // GET - Get single exercise
   if (req.method === 'GET') {
     try {
-      const exercise = await Exercise.findById(exerciseId);
+      const exercise = await Exercise.findById(exerciseId).lean();
 
       if (!exercise) {
         return sendError(res, 404, 'Exercise not found');
