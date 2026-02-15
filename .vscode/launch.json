@@ -7,25 +7,42 @@
       "request": "launch",
       "cwd": "${workspaceFolder}",
       "runtimeExecutable": "npx",
-      "runtimeArgs": ["vercel", "dev", "--listen", "3000", "--debug"],
+      "runtimeArgs": [
+        "vercel",
+        "dev",
+        "--listen",
+        "3000",
+        "--debug"
+      ],
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
-      "skipFiles": ["<node_internals>/**", "**/node_modules/**"]
+      "skipFiles": [
+        "<node_internals>/**",
+        "**/node_modules/**"
+      ]
     },
     {
       "name": "Debug Backend",
       "type": "node",
       "request": "launch",
       "cwd": "${workspaceFolder}/back-end",
-      "runtimeArgs": ["-r", "ts-node/register"],
-      "args": ["${workspaceFolder}/back-end/src/app.ts"],
+      "runtimeArgs": [
+        "-r",
+        "ts-node/register"
+      ],
+      "args": [
+        "${workspaceFolder}/back-end/src/app.ts"
+      ],
       "env": {
         "TS_NODE_PROJECT": "${workspaceFolder}/back-end/tsconfig.json"
       },
       "sourceMaps": true,
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
-      "skipFiles": ["<node_internals>/**", "**/node_modules/**"]
+      "skipFiles": [
+        "<node_internals>/**",
+        "**/node_modules/**"
+      ]
     },
     {
       "name": "Start Frontend",
@@ -33,7 +50,10 @@
       "request": "launch",
       "cwd": "${workspaceFolder}/front-end",
       "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "dev"],
+      "runtimeArgs": [
+        "run",
+        "dev"
+      ],
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen"
     },
@@ -43,7 +63,13 @@
       "request": "launch",
       "url": "http://localhost:3001",
       "webRoot": "${workspaceFolder}/front-end/src",
-      "preLaunchTask": "Start Frontend Dev Server"
+      "preLaunchTask": "Start Frontend Dev Server",
+      "pathMappings": [
+        {
+          "url": "http://localhost:3001/src",
+          "path": "${workspaceFolder}/front-end/src"
+        }
+      ]
     },
     {
       "name": "Debug Frontend (Chrome)",
@@ -58,22 +84,33 @@
       "type": "node",
       "request": "launch",
       "cwd": "${workspaceFolder}/back-end",
-      "runtimeArgs": ["-r", "ts-node/register"],
-      "args": ["${workspaceFolder}/back-end/src/scripts/parseGymJournal.ts"],
+      "runtimeArgs": [
+        "-r",
+        "ts-node/register"
+      ],
+      "args": [
+        "${workspaceFolder}/back-end/src/scripts/parseGymJournal.ts"
+      ],
       "env": {
         "TS_NODE_PROJECT": "${workspaceFolder}/back-end/tsconfig.json"
       },
       "sourceMaps": true,
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
-      "skipFiles": ["<node_internals>/**", "**/node_modules/**"]
+      "skipFiles": [
+        "<node_internals>/**",
+        "**/node_modules/**"
+      ]
     },
     {
       "name": "Run: Seed from Journal (Dry Run)",
       "type": "node",
       "request": "launch",
       "cwd": "${workspaceFolder}/back-end",
-      "runtimeArgs": ["-r", "ts-node/register"],
+      "runtimeArgs": [
+        "-r",
+        "ts-node/register"
+      ],
       "args": [
         "${workspaceFolder}/back-end/src/scripts/seedFromJournal.ts",
         "--dry-run"
@@ -84,17 +121,24 @@
       "sourceMaps": true,
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
-      "skipFiles": ["<node_internals>/**", "**/node_modules/**"]
+      "skipFiles": [
+        "<node_internals>/**",
+        "**/node_modules/**"
+      ]
     },
     {
       "name": "Run: Seed from Journal",
       "type": "node",
       "request": "launch",
       "cwd": "${workspaceFolder}/back-end",
-      "runtimeArgs": ["-r", "ts-node/register"],
-      "args": ["${workspaceFolder}/back-end/src/scripts/seedFromJournal.ts",
+      "runtimeArgs": [
+        "-r",
+        "ts-node/register"
+      ],
+      "args": [
+        "${workspaceFolder}/back-end/src/scripts/seedFromJournal.ts",
         "--clear",
-        "--user=6976b1c7de98bc91957c7753",
+        "--user=6976b1c7de98bc91957c7753"
       ],
       "env": {
         "TS_NODE_PROJECT": "${workspaceFolder}/back-end/tsconfig.json"
@@ -102,14 +146,20 @@
       "sourceMaps": true,
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
-      "skipFiles": ["<node_internals>/**", "**/node_modules/**"]
+      "skipFiles": [
+        "<node_internals>/**",
+        "**/node_modules/**"
+      ]
     },
     {
       "name": "Run: Seed from Journal (Clear Existing)",
       "type": "node",
       "request": "launch",
       "cwd": "${workspaceFolder}/back-end",
-      "runtimeArgs": ["-r", "ts-node/register"],
+      "runtimeArgs": [
+        "-r",
+        "ts-node/register"
+      ],
       "args": [
         "${workspaceFolder}/back-end/src/scripts/seedFromJournal.ts",
         "--clear"
@@ -120,14 +170,20 @@
       "sourceMaps": true,
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
-      "skipFiles": ["<node_internals>/**", "**/node_modules/**"]
+      "skipFiles": [
+        "<node_internals>/**",
+        "**/node_modules/**"
+      ]
     },
     {
       "name": "PROD: Seed from Journal (Dry Run)",
       "type": "node",
       "request": "launch",
       "cwd": "${workspaceFolder}/back-end",
-      "runtimeArgs": ["-r", "ts-node/register"],
+      "runtimeArgs": [
+        "-r",
+        "ts-node/register"
+      ],
       "args": [
         "${workspaceFolder}/back-end/src/scripts/seedFromJournal.ts",
         "--dry-run"
@@ -139,14 +195,20 @@
       "sourceMaps": true,
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
-      "skipFiles": ["<node_internals>/**", "**/node_modules/**"]
+      "skipFiles": [
+        "<node_internals>/**",
+        "**/node_modules/**"
+      ]
     },
     {
       "name": "PROD: Seed from Journal",
       "type": "node",
       "request": "launch",
       "cwd": "${workspaceFolder}/back-end",
-      "runtimeArgs": ["-r", "ts-node/register"],
+      "runtimeArgs": [
+        "-r",
+        "ts-node/register"
+      ],
       "args": [
         "${workspaceFolder}/back-end/src/scripts/seedFromJournal.ts",
         "--user=6976c7316f98bb9614735942"
@@ -158,14 +220,20 @@
       "sourceMaps": true,
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
-      "skipFiles": ["<node_internals>/**", "**/node_modules/**"]
+      "skipFiles": [
+        "<node_internals>/**",
+        "**/node_modules/**"
+      ]
     },
     {
       "name": "PROD: Seed from Journal (Clear Existing)",
       "type": "node",
       "request": "launch",
       "cwd": "${workspaceFolder}/back-end",
-      "runtimeArgs": ["-r", "ts-node/register"],
+      "runtimeArgs": [
+        "-r",
+        "ts-node/register"
+      ],
       "args": [
         "${workspaceFolder}/back-end/src/scripts/seedFromJournal.ts",
         "--clear",
@@ -178,7 +246,10 @@
       "sourceMaps": true,
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
-      "skipFiles": ["<node_internals>/**", "**/node_modules/**"]
+      "skipFiles": [
+        "<node_internals>/**",
+        "**/node_modules/**"
+      ]
     }
   ],
   "compounds": [
