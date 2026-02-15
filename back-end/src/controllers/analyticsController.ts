@@ -76,6 +76,7 @@ export const getVolumeSummary = async (req: AuthRequest, res: Response): Promise
 
         for (const granularGroup of groups) {
           const parent = getParentBodyPart(granularGroup);
+          if (!parent) continue;
           const current = bodyPartMap.get(parent) || { sets: 0, lastTrainedDate: null };
           current.sets += sets;
 
