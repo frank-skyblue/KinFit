@@ -98,19 +98,24 @@ export interface Exercise {
 }
 
 export interface SetEntry {
+  // Strength fields
   weightValue?: number;
-  weightType: 'e' | 'a' | 'bw';
-  reps: number;
-  sets: number;
+  weightType?: 'e' | 'a' | 'bw';
+  reps?: number;
+  sets?: number;
+  // Cardio fields
+  duration?: number;       // in minutes
+  intensityZone?: number;  // 1–4
 }
 
 export interface ExerciseEntry {
   exerciseId: string;
   exerciseName: string;
+  category?: 'strength' | 'cardio' | 'flexibility' | 'other';
   weightValue?: number;
-  weightType: 'e' | 'a' | 'bw';
-  reps: number;
-  sets: number;
+  weightType?: 'e' | 'a' | 'bw';
+  reps?: number;
+  sets?: number;
   setEntries?: SetEntry[];
   notes?: string;
   orderIndex: number;
@@ -128,13 +133,24 @@ export const uniqueId = (): string => {
 /** Resolve set entries from an exercise, falling back to legacy single-line fields */
 export const getSetEntries = (exercise: ExerciseEntry): SetEntry[] => {
   if (exercise.setEntries && exercise.setEntries.length > 0) return exercise.setEntries;
-  return [{ weightValue: exercise.weightValue, weightType: exercise.weightType, reps: exercise.reps, sets: exercise.sets }];
+  if (exercise.category === 'cardio') {
+    return [{ duration: 30, intensityZone: 2 }];
+  }
+  return [{ weightValue: exercise.weightValue, weightType: exercise.weightType || 'a', reps: exercise.reps || 1, sets: exercise.sets || 1 }];
 };
 
+/** Check if an exercise uses cardio tracking */
+export const isCardioExercise = (exercise: ExerciseEntry): boolean =>
+  exercise.category === 'cardio';
+
 /** Format a single set entry as compact notation */
-export const formatSetNotation = (entry: SetEntry): string => {
+export const formatSetNotation = (entry: SetEntry, category?: string): string => {
+  if (category === 'cardio') {
+    const zone = entry.intensityZone ? `Z${entry.intensityZone}` : '';
+    return `${entry.duration || 0}min${zone ? ` · ${zone}` : ''}`;
+  }
   if (entry.weightType === 'bw') return `bw × ${entry.reps} × ${entry.sets}`;
-  return `${entry.weightValue || 0}${entry.weightType} × ${entry.reps} × ${entry.sets}`;
+  return `${entry.weightValue || 0}${entry.weightType || 'a'} × ${entry.reps} × ${entry.sets}`;
 };
 
 /** Normalize an exercise before saving — sets legacy fields from first setEntry for backward compat */
@@ -143,6 +159,11 @@ export const normalizeExerciseForSave = (exercise: ExerciseEntry): ExerciseEntry
   const first = entries[0];
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { _dragId, ...rest } = exercise;
+
+  if (exercise.category === 'cardio') {
+    return { ...rest, setEntries: entries };
+  }
+
   return {
     ...rest,
     weightValue: first.weightValue,

@@ -20,7 +20,7 @@ const ExerciseReadCard = ({ exercise, index }: ExerciseReadCardProps) => {
       <div className="space-y-0.5">
         {entries.map((entry, i) => (
           <p key={i} className="text-sm font-inter text-kin-teal font-medium">
-            {formatSetNotation(entry)}
+            {formatSetNotation(entry, exercise.category)}
           </p>
         ))}
       </div>

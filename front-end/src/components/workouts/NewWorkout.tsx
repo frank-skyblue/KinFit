@@ -70,14 +70,20 @@ const NewWorkout = () => {
   }, []);
 
   const handleAddExercise = (exercise: Exercise) => {
+    const isCardio = exercise.category === 'cardio';
+    const defaultEntries = isCardio
+      ? [{ duration: 30, intensityZone: 2 }]
+      : [{ weightValue: 0, weightType: 'a' as const, reps: 10, sets: 3 }];
+
     const newExercise: ExerciseEntry = {
       exerciseId: exercise._id,
       exerciseName: exercise.name,
-      weightValue: 0,
-      weightType: 'a',
-      reps: 10,
-      sets: 3,
-      setEntries: [{ weightValue: 0, weightType: 'a', reps: 10, sets: 3 }],
+      category: exercise.category as ExerciseEntry['category'],
+      weightValue: isCardio ? undefined : 0,
+      weightType: isCardio ? undefined : 'a',
+      reps: isCardio ? undefined : 10,
+      sets: isCardio ? undefined : 3,
+      setEntries: defaultEntries,
       notes: '',
       orderIndex: workoutData.exercises.length,
       _dragId: uniqueId(),

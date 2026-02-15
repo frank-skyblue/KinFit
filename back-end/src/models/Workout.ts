@@ -1,19 +1,24 @@
 import mongoose, { Document, Schema } from 'mongoose';
 
 export interface ISetEntry {
+  // Strength fields
   weightValue?: number;
-  weightType: 'e' | 'a' | 'bw';
-  reps: number;
-  sets: number;
+  weightType?: 'e' | 'a' | 'bw';
+  reps?: number;
+  sets?: number;
+  // Cardio fields
+  duration?: number;       // in minutes
+  intensityZone?: number;  // 1–4
 }
 
 export interface IExerciseEntry {
   exerciseId: mongoose.Types.ObjectId;
   exerciseName: string;
+  category?: 'strength' | 'cardio' | 'flexibility' | 'other';
   weightValue?: number;
-  weightType: 'e' | 'a' | 'bw'; // e = each hand, a = actual/total, bw = bodyweight
-  reps: number;
-  sets: number;
+  weightType?: 'e' | 'a' | 'bw';
+  reps?: number;
+  sets?: number;
   setEntries?: ISetEntry[];
   notes?: string;
   orderIndex: number;
@@ -35,25 +40,14 @@ export interface IWorkout extends Document {
 
 const setEntrySchema = new Schema<ISetEntry>(
   {
-    weightValue: {
-      type: Number,
-      min: 0,
-    },
-    weightType: {
-      type: String,
-      enum: ['e', 'a', 'bw'],
-      required: true,
-    },
-    reps: {
-      type: Number,
-      required: true,
-      min: 1,
-    },
-    sets: {
-      type: Number,
-      required: true,
-      min: 1,
-    },
+    // Strength fields
+    weightValue: { type: Number, min: 0 },
+    weightType: { type: String, enum: ['e', 'a', 'bw'] },
+    reps: { type: Number, min: 1 },
+    sets: { type: Number, min: 1 },
+    // Cardio fields
+    duration: { type: Number, min: 0 },       // in minutes
+    intensityZone: { type: Number, min: 1, max: 4 },
   },
   { _id: false }
 );
@@ -69,6 +63,11 @@ const exerciseEntrySchema = new Schema<IExerciseEntry>(
       type: String,
       required: true,
     },
+    category: {
+      type: String,
+      enum: ['strength', 'cardio', 'flexibility', 'other'],
+      default: 'strength',
+    },
     weightValue: {
       type: Number,
       min: 0,
@@ -76,18 +75,15 @@ const exerciseEntrySchema = new Schema<IExerciseEntry>(
     weightType: {
       type: String,
       enum: ['e', 'a', 'bw'],
-      required: true,
       default: 'a',
     },
     reps: {
       type: Number,
-      required: true,
       min: 1,
       default: 1,
     },
     sets: {
       type: Number,
-      required: true,
       min: 1,
       default: 1,
     },
@@ -164,16 +160,18 @@ workoutSchema.index({ userId: 1, createdAt: -1 });
 workoutSchema.index({ 'exercises.exerciseId': 1 });
 
 // Calculate volume for a single set entry
-const calcEntryVolume = (entry: { weightType: string; weightValue?: number; reps: number; sets: number }) => {
+const calcEntryVolume = (entry: { weightType?: string; weightValue?: number; reps?: number; sets?: number }) => {
   const weight = entry.weightType === 'bw' ? 0 : entry.weightValue || 0;
   const multiplier = entry.weightType === 'e' ? 2 : 1; // Double weight for dumbbells (each hand)
-  return weight * multiplier * entry.reps * entry.sets;
+  return weight * multiplier * (entry.reps || 0) * (entry.sets || 0);
 };
 
-// Calculate total volume before saving
+// Calculate total volume before saving (strength exercises only)
 workoutSchema.pre('save', function (next) {
   if (this.exercises && this.exercises.length > 0) {
     this.totalVolume = this.exercises.reduce((total, exercise) => {
+      // Skip cardio exercises — they don't contribute to volume
+      if (exercise.category === 'cardio') return total;
       // Use setEntries if available, otherwise fall back to legacy fields
       if (exercise.setEntries && exercise.setEntries.length > 0) {
         return total + exercise.setEntries.reduce((sub, entry) => sub + calcEntryVolume(entry), 0);
