@@ -381,7 +381,11 @@ export const getVolumeSummary = (): Promise<VolumeSummaryResponse> =>
 // API — Profile
 // -----------------------------------------------------------------------------
 
-export const getProfile = () => request.get('/profile');
+export interface GetProfileResponse {
+  user: User;
+}
+
+export const getProfile = () => request.get<GetProfileResponse>('/profile');
 
 export const updateProfile = (data: ProfileUpdateData) => request.put('/profile', data);
 

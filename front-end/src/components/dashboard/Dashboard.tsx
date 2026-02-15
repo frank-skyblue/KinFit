@@ -1,31 +1,34 @@
-import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { useAuth } from '../../contexts/AuthContext';
-import { getWorkouts, Workout } from '../../services/api';
-import { formatDateShort } from '../../utils/date';
-import Layout from './Layout';
-import LoadingSpinner from '../common/LoadingSpinner';
-import VolumeSummary from './VolumeSummary';
+import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import { useAuth } from "../../contexts/AuthContext";
+import { getWorkouts, Workout } from "../../services/api";
+import { formatDateShort } from "../../utils/date";
+import Layout from "./Layout";
+import LoadingSpinner from "../common/LoadingSpinner";
+import VolumeSummary from "./VolumeSummary";
 
 const Dashboard = () => {
-  const { user } = useAuth();
+  const { user, refreshUser } = useAuth();
   const [workouts, setWorkouts] = useState<Workout[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const fetchWorkouts = async () => {
+    const loadDashboard = async () => {
       try {
-        const response = await getWorkouts(1, 5);
-        setWorkouts(response.workouts);
+        const [workoutsRes] = await Promise.all([
+          getWorkouts(1, 5),
+          refreshUser(),
+        ]);
+        setWorkouts(workoutsRes.workouts);
       } catch (error) {
-        console.error('Failed to fetch workouts:', error);
+        console.error("Failed to load dashboard:", error);
       } finally {
         setIsLoading(false);
       }
     };
 
-    fetchWorkouts();
-  }, []);
+    loadDashboard();
+  }, [refreshUser]);
 
   return (
     <Layout>
@@ -33,15 +36,25 @@ const Dashboard = () => {
         {/* Welcome Header - Compact */}
         <div className="flex items-center justify-between">
           <h1 className="text-xl font-semibold font-montserrat text-kin-navy">
-            Hi, {user!.displayName.split(' ')[0] || 'there'}!
+            Hi, {user!.displayName.split(" ")[0] || "there"}!
           </h1>
           <Link
             to="/workouts/new"
             className="bg-kin-coral text-white rounded-kin-sm font-semibold font-montserrat py-2 px-4 text-sm hover:bg-kin-coral-600 shadow-kin-soft transition flex items-center gap-2"
             aria-label="Start new workout"
           >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+            <svg
+              className="w-4 h-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 4v16m8-8H4"
+              />
             </svg>
             New Workout
           </Link>
@@ -61,7 +74,9 @@ const Dashboard = () => {
               <p className="text-xl font-bold font-montserrat text-kin-coral">
                 {user!.currentStreak}
               </p>
-              <p className="text-xs font-inter text-kin-stone-500">Day Streak</p>
+              <p className="text-xs font-inter text-kin-stone-500">
+                Day Streak
+              </p>
             </div>
             <div className="w-px h-8 bg-kin-stone-200" />
             <div className="flex-1">
@@ -97,7 +112,9 @@ const Dashboard = () => {
             </div>
           ) : workouts.length === 0 ? (
             <div className="text-center py-6">
-              <p className="text-sm text-kin-stone-500 font-inter mb-3">No workouts yet</p>
+              <p className="text-sm text-kin-stone-500 font-inter mb-3">
+                No workouts yet
+              </p>
               <Link
                 to="/workouts/new"
                 className="inline-block bg-kin-coral text-white rounded-kin-sm font-medium font-montserrat py-2 px-4 text-sm hover:bg-kin-coral-600 transition"
@@ -116,17 +133,20 @@ const Dashboard = () => {
                   <div className="flex items-center justify-between">
                     <div className="min-w-0 flex-1">
                       <h3 className="font-medium font-montserrat text-kin-navy text-sm truncate">
-                        {workout.title || 'Workout Session'}
+                        {workout.title || "Workout Session"}
                       </h3>
                       <p className="text-xs text-kin-stone-500 font-inter">
-                        {formatDateShort(workout.date)} • {workout.exercises.length} exercises
+                        {formatDateShort(workout.date)} •{" "}
+                        {workout.exercises.length} exercises
                       </p>
                     </div>
                     <div className="text-right ml-3">
                       <p className="font-semibold font-montserrat text-kin-navy text-sm">
                         {workout.totalVolume.toLocaleString()}
                       </p>
-                      <p className="text-xs text-kin-stone-500">{user!.units}</p>
+                      <p className="text-xs text-kin-stone-500">
+                        {user!.units}
+                      </p>
                     </div>
                   </div>
                 </Link>
@@ -140,4 +160,3 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
-

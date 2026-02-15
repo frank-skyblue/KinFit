@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { User, login as apiLogin, register as apiRegister, verifyAuth } from '../services/api';
+import { User, login as apiLogin, register as apiRegister, verifyAuth, getProfile } from '../services/api';
 import { AUTH_TOKEN_KEY, USER_KEY } from '../constants/auth';
 import { getApiErrorMessage } from '../utils/errors';
 
@@ -10,6 +10,7 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<void>;
   register: (username: string, email: string, password: string, displayName: string) => Promise<void>;
   logout: () => void;
+  refreshUser: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -84,6 +85,19 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     window.location.href = '/login';
   };
 
+  const refreshUser = async () => {
+    try {
+      const response = await getProfile();
+      const userData = response.user;
+      setUser(userData);
+      if (localStorage.getItem(USER_KEY)) {
+        localStorage.setItem(USER_KEY, JSON.stringify(userData));
+      }
+    } catch (error) {
+      console.error('Failed to refresh user:', error);
+    }
+  };
+
   const value: AuthContextType = {
     user,
     isAuthenticated: !!user,
@@ -91,6 +105,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     login,
     register,
     logout,
+    refreshUser,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
